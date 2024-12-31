@@ -1,0 +1,112 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{algorithmic}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{cite}
+\usepackage{dirtree}
+\usepackage{fancyhdr}
+\usepackage[pdftex]{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepackage{textcomp}
+\usepackage{tikz}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{xspace}
+
+\usetikzlibrary{positioning, arrows.meta}
+
+\usetikzlibrary{pgfplots.groupplots}
+
+\newcommand{\crayex}{HPE Cray EX\xspace} % standardize name for Cray EX platform
+\newcommand{\craympich}{Cray-MPICH\xspace} % standardize name for cray mpich
+\newcommand{\stackinator}{Stackinator\xspace} % standardize name the stackinator tool
+\newcommand{\spack}{Spack\xspace} % standardize name for spack
+\newcommand{\todo}[1]{\textbf{\textcolor{blue}{TODO: #1}}} % add a comment to the article
+\newcommand{\assign}[1]{\textbf{\textcolor{blue!20!red}{TODO: #1}}} % add a comment to the article
+\newcommand{\hilight}[1]{\textbf{\textcolor{blue!20!red}{#1}}} % add a comment to the article
+\newcommand{\tocite}[1]{\textbf{\textcolor{blue!20!red}{[#1]}}} % mark missing citation
+\newcommand{\sect}[1]{Section~\ref{#1}\xspace}  % consistent references to sections
+\newcommand{\tbl}[1]{Table~\ref{#1}\xspace}  % consistent references to tables
+\newcommand{\fig}[1]{Fig.~\ref{#1}\xspace}   % consistent references to figures
+\newcommand{\eq}[1]{(\ref{#1})\xspace}   % consistent references to equations
+\newcommand{\lst}[1]{\lstinline{#1}\xspace}   % shorthand for inline listing
+
+\input{listing-spec.tex}
+\renewcommand\DTstyle{\footnotesize\tt}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\lstset{
+    literate={~} {$\sim$}{1}
+}
+\begin{document}
+
+\title{No More CPE on Alps}
+
+\author{
+    \IEEEauthorblockN{Jonathan Coles}
+    \IEEEauthorblockA{
+        \textit{CSCS}\\
+        Zurich, Switzerland \\
+        jonathan.coles@cscs.ch}\\
+    \IEEEauthorblockN{Ben Cumming}
+    \IEEEauthorblockA{
+        \textit{CSCS}\\
+        Zurich, Switzerland \\
+        bcumming@cscs.ch}
+    \and
+    \IEEEauthorblockN{Theofilos-Ioannis Manitaras}
+    \IEEEauthorblockA{
+        \textit{CSCS}\\
+        Lugano, Switzerland \\
+        theofilos.manitaras@cscs.ch}\\
+    \IEEEauthorblockN{Jean-Guillaume Piccinali}
+    \IEEEauthorblockA{
+        \textit{CSCS}\\
+        Lugano, Switzerland \\
+        jgp@cscs.ch}
+    \and
+    \IEEEauthorblockN{Simon Pintarelli}
+    \IEEEauthorblockA{
+        \textit{CSCS}\\
+        Zurich, Switzerland \\
+        simon.pintarelli@cscs.ch}\\
+    \IEEEauthorblockN{Harmen Stoppels}
+    \IEEEauthorblockA{
+        \textit{Stoppels Consulting/LLNL}\\
+        Zurich, Switzerland \\
+        harmen@stoppels.ch}
+}
+
+\maketitle
+
+\begin{abstract}
+%\input{abstract.tex}
+\end{abstract}
+
+\begin{IEEEkeywords}
+CPE, squashfs, slurm, spack
+\end{IEEEkeywords}
+
+%\section{Introduction}
+%\input{introduction.tex}
+
+%\section{Spack Stacks}
+%\label{sec:spack-stacks}
+%\input{spack-stacks.tex}
+
+%*************************************************
+\bibliographystyle{abbrv}
+\bibliography{paper}
+%*************************************************
+
+\end{document}
+
+%%% Local Variables:
+%%% TeX-engine: default
+%%% End:
