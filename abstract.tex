@@ -1,0 +1,8 @@
+A key part of HPC centers' service offering is user-facing software -- including libraries, tools, applications and programming environments -- tuned for the node and network architecture of HPC systems.
+The teams that maintain and support this software face key challenges: providing a stable software platform for users with long running and fixed project requirements;  providing the latest software for cutting edge hardware; giving full responsibility to build, modify and deploy all levels of the sotware stack to the responsible team (who do not have root access); and adopting deployment practices that don't look like 1990.
+
+The Cray Programming Environment (CPE) is updated every 6 months, must be installed and modified by system administrators, the provided softare lags behind the latest versions, . Thus updating CPE, and any software that depends on it, can be very disruptive, and is antithetical to addressing our key challenges.
+
+This paper will discuss how CSCS has addressed these challenges:
+taking the parts of CPE that we want to provide to users (e.g. cray-mpich), and repackaging them for deployment as isolated, reproducible environments that can be built by CSCS staff and users alike, using pipelines that require no intervention from system administrators, and no modifications to a running system.
+

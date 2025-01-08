@@ -6,9 +6,10 @@ all: paper.pdf
 paper.pdf : $(TEXFILES) $(IMAGEFILES) bibup
 	pdflatex paper
 
-bibup : paper.bib
+#bibup : paper.bib
+bibup :
 	pdflatex paper
-	bibtex paper
+	#bibtex paper
 	pdflatex paper
 
 force : paper.pdf

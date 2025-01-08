@@ -2,7 +2,7 @@
 
 [**Call for papers**](https://cug.org/cug-2025-call-for-papers/)
 
-The *submission category* is **Applications, Analytics and Environments**, which covers "Programmin Environment, Compilers, Libraries, Tools".
+The *submission category* is **Applications, Analytics and Environments**, which covers "Programming Environment, Compilers, Libraries, Tools".
 
 ## CUG23 paper
 
@@ -21,11 +21,14 @@ This work we first presented at CUG23 "Deploying Alternative User Environments o
 
 ## Thesis
 
-The aims of this work are
-
 * gitops deployment of user environments/applications/programming environments
+    * "environment-as-code"
     * each environment is an artifact that is not replaced by new versions
     * manage all descriptions through git and pipelines
+    * **aim** all uenvs are defined as recipes in a GitHub repository
+    * **aim** a CI/CD pipeline builds and deploys uenv images using triggers on the GitHub repository
+    * **aim** each build generates an artifcat
+    * **aim** images can be rebuilt using the meta data
 * decouple environments
     * update and upgrade environments independently of one another
     * meet the twin aims of:
@@ -34,15 +37,16 @@ The aims of this work are
     * achieved through:
         * reducing system dependencies
         * each environment is an artifact
-* deploying software should be user-land
-    * no root privelages
+    * **aim**: existing uenv and workflows based on them are unaffected by releasing new versions of the uenv
+    * **aim**: existing uenv are not broken by updates to the underlying system - and if a major upgrade does break them, they can be rebuilt.
+    * **aim**: uenv that provide the latest versions of software (including pre-releases of cray-mpich, the latest cuda) can be deployed as soon
+* the team responsible for supporting software environments should have full responsibility for its deployment
+    * to create and deploy software should not require root privelages, and should not require any modification to the system itself.
     * no update to OS images, no reboot or system administrator / system engineer involvement
-    * **aim**: staff who support applications and PE should have full control over deployed software (end to end responsibility)
-    * **aim**: allow communities to take control of software deployments using the same tools (MCH, EXCLAIM, ESIWAG CI/CD pipelines)
-    * **aim**: allow individual users to build uenv, and store+share them through (`uenv build`)
+    * **aim**: staff who support applications and PE should have end to end responsibility
+    * **aim**: user communities can take control of software deployments using the same tools (MCH, EXCLAIM, ESIWAG CI/CD pipelines)
+    * **aim**: individual users can build and share their own uenv images
 
-* responsibility for deploying software is moved to support staff with "normal user rights"
-    * creating a uenv or CPE container does not require special privelages
 
 ## Topics
 

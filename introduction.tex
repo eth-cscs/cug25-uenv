@@ -1,0 +1,54 @@
+Alps supports diverse communities and users, each with their own specific software requirements.
+The number of use cases with new requirements continues to grow, to the point where responsibility for providing software environments is distrubuted over more groups.
+
+What each of these groups have in common is that they are working in user-facing roles, typically with the same access rights as users -- that is, they do not have the ability to install software as root.
+
+To effectively provide software: end to end responsibility for full stacks; reduce dependence of software stacks on the base image stage; decouple software environments; automate deployment; support users BYO software stack; provide ready-built .
+
+There is no silver bullet that meets all requirements.
+For example, HPC containers allow users to bring their own software environments, or bring software stacks built elsewhere -- by supporting containers from the NVIDIA Container Registry (NGC) opens up a lot of opportunity to our use community.
+However, HPC centers provide complicated software stacks for their user communities, for which they develop and maintain workflows based on tools like Spack and EasyBuild.
+
+At CUG23 CSCS presented a paper about \stackinator, a tool that was developed to build isolated software environments as squashfs images.
+This paper gives a brief overview of \stackinator, and a summary of new features and improvements to the tool.
+
+The main focus of this paper will be on how we address the larger challenge above.
+The main tool we use is uenv, however container 
+
+\subsection{Objective 1: GitOps Deployment}
+
+gitops deployment of user environments/applications/programming environments
+
+"environment-as-code".
+manage all descriptions through git and pipelines.
+each environment is an artifact that is not replaced by new versions.
+
+\begin{itemize}
+    \item \textbf{aim:} all uenvs are defined as recipes in a GitHub repository
+    \item \textbf{aim:} a CI/CD pipeline builds and deploys uenv images using triggers on the GitHub repository
+    \item \textbf{aim:} each build generates an artifcat
+    \item \textbf{aim:} images can be rebuilt using the meta data
+\end{itemize}
+
+\subsection{Objective 2: Decouple environments}
+
+update and upgrade environments independently of one another
+provide both long term stability and the latest software (MPI, CUDA, NCCL, libfabric, etc) as soon as it is released.
+
+\begin{itemize}
+    \item \textbf{aim:} existing uenv and workflows based on them are unaffected by releasing new versions of the uenv
+    \item \textbf{aim:} existing uenv are not broken by updates to the underlying system - and if a major upgrade does break them, they can be rebuilt.
+    \item \textbf{aim:} uenv that provide the latest versions of software (including pre-releases of cray-mpich, the latest cuda) can be deployed as soon
+\end{itemize}
+
+\subsection{the team responsible for supporting software environments should have full responsibility for its deployment}
+
+the team responsible for supporting software environments should have full responsibility for its deployment.
+to create and deploy software should not require root privelages, and should not require any modification to the system itself.
+no update to OS images, no reboot or system administrator / system engineer involvement.
+
+\begin{itemize}
+    \item \textbf{aim:} staff who support applications and PE should have end to end responsibility
+    \item \textbf{aim:} user communities can take control of software deployments using the same tools (MCH, EXCLAIM, ESIWAG CI/CD pipelines)
+    \item \textbf{aim:} individual users can build and share their own uenv images
+\end{itemize}
