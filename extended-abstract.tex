@@ -11,14 +11,56 @@
 \end{itemize}
 
 %------------------------------------------------------------------------------
+\section{Stackinator: Building Software}
+%------------------------------------------------------------------------------
+
+%..............................................................................
+\subsection{}
+%..............................................................................
+
+%..............................................................................
+\subsection{OpenMPI}
+%..............................................................................
+
+\openmpi with support for libfabric is available through uenv on Alps.
+The main motivation behind providing it is to have an alternative to \craympich, for when \craympich has application-specific performance problems or bugs, or users want to install a pre-compiled application that was linked against \openmpi.
+
+In the paper we will describe how we configure \openmpi with libfabric, and show performance results in applications up to thousands of Grace-Hopper GPUs.
+We will also show the recipes for building different versions of the open source distributions of libfabric and the CXI driver from source, and integrating them in a uenv.
+
+%..............................................................................
+\subsection{NVIDIA libraries}
+%..............................................................................
+
+NVIDIA provide a suite of mathematical and communication libraries for distributed computation.
+Application developers are integrating these libraries, where they are required for the best performance
+
+In particular, the \cufftmp and \cusolvermp libraries implement optimized distributed FFT and linear algebra solvers.
+Examples of important applications that require these libraries for optimal performance are \cufftmp in GROMACS and \cusolvermp in VASP.
+These two libraries use \nvshmem for distributed communication.
+\nvshmem creates a global address space for data that spans the memory of multiple GPUs (both inter-node and intra-node) athat can be accessed via GPU-initiated operations.
+
+Both \cufftmp and \cusolvermp are distrbuted as pre-compiled binary distributions.
+\cufftmp in particular is challenging, because it is only distributed inside the NVIDIA HPC SDK, where it is linked against communication libraries that target UCX/Infiniband, not libfabric/Slingshot.
+
+The paper will describe in detail how CSCS provides these packages:
+\begin{itemize}
+    \item create a custom spack package to the latest version \nvshmem with support for libfabric/Slingshot 11.
+    \item extract \cufftmp from the NVIDIA HPC SDK.
+    \item write Spack packages that install \cufftmp and \cusolvermp and patch them to use \nvshmem built for libfabric.
+    \item customise the Spack packages for GROMACS.
+\end{itemize}
+
+%------------------------------------------------------------------------------
 \section{Multi cluster/multi architecture}
 %------------------------------------------------------------------------------
 
 Alps is a HPE Cray EX system, with the five node node types described in \tbl{tab:alps-nodes}.
+On top of the Alps infrastructure, CSCS deploys vClusters (versatile software defined clusters), where each vCluster is a separate SLURM vCluster that is customised for specific platforms.
 
-On top of the Alps infrastructure, CSCS deploys vClusters (versatile software defined clusters).
-vClusters have separate slurm controllers and storage attached.
-Two vClusters might have different versions of some core dependencies (e.g. xpmem and libfabric) installed on the system.
+Each vCluster is configured for different target communities, use cases or customers.
+As such, the version of SLURM, mounted file systems and installed software can vary between vClusters.
+Of particular interest to uenv, the version of \xpmemm and \libfabric) installed on the system.
 
 The following characteristics define a uenv
 \begin{itemize}

@@ -1,8 +1,12 @@
-A key part of HPC centers' service offering is user-facing software -- including libraries, tools, applications and programming environments -- tuned for the node and network architecture of HPC systems.
-The teams that maintain and support this software face key challenges: providing a stable software platform for users with long running and fixed project requirements;  providing the latest software for cutting edge hardware; giving full responsibility to build, modify and deploy all levels of the sotware stack to the responsible team (who do not have root access); and adopting deployment practices that don't look like 1990.
+A key part of HPC centers' service offering is user-facing software -- libraries, tools, applications and programming environments -- tuned for the node and network architecture of the centers' HPC systems.
+The teams that maintain and support this software face key challenges: providing a stable software platform for users with long running and fixed project requirements;  providing the latest versions of software for developers; giving full responsibility to build, modify and deploy all levels of the sotware stack to the responsible team (who do not have root access); and reproducible deployment based on GitOps/"as-code" practices.
 
-The Cray Programming Environment (CPE) is updated every 6 months, must be installed and modified by system administrators, the provided softare lags behind the latest versions, . Thus updating CPE, and any software that depends on it, can be very disruptive, and is antithetical to addressing our key challenges.
+This paper will discuss how CSCS has addressed these challenges on Alps, by removing the CPE from the configuration of our system, in favour of small independent software environments called uenv, that can be deployed from text-file recipes.
+The tool used to build uenv was presented at CUG23.
+First, we will discuss adapting Slinghshot-optimised libraries from HPE and NVIDIA (e.g. \cufftmp); the CI/CD pipeline that builds software environments, and deploys them in a container registry; and the command line tools and SLURM plugin that are users' interface to the software environments.
 
-This paper will discuss how CSCS has addressed these challenges:
-taking the parts of CPE that we want to provide to users (e.g. cray-mpich), and repackaging them for deployment as isolated, reproducible environments that can be built by CSCS staff and users alike, using pipelines that require no intervention from system administrators, and no modifications to a running system.
+Finally, how the tool is used to provide special use cases such as JupyterHub, and summarise the user and support team experience with the tool -- both positive and negative.
 
+%taking the parts of CPE that we want to provide to users (e.g. cray-mpich), and repackaging them for deployment as isolated, reproducible environments that can be built by CSCS staff and users alike, using pipelines that require no intervention from system administrators, and no modifications to a running system.
+
+%The Cray Programming Environment (CPE) is updated every 6 months, must be installed and modified by system administrators, the provided softare lags behind the latest versions, . Thus updating CPE, and any software that depends on it, can be very disruptive, and is antithetical to addressing our key challenges.

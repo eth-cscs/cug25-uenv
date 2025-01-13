@@ -47,6 +47,15 @@ This work we first presented at CUG23 "Deploying Alternative User Environments o
     * **aim**: user communities can take control of software deployments using the same tools (MCH, EXCLAIM, ESIWAG CI/CD pipelines)
     * **aim**: individual users can build and share their own uenv images
 
+What's missing?
+* provide optimized software for the target platform
+    * don't use CPE: we don't have control over the versions of software
+    * don't use NVHPC: communication libraries are not tuned for HPE Cray EX (slingshot 11) architecture.
+    * integration of NVIDIA software has always been patchy.
+    * **aim**: provide cray-mpich, nccl, cufftmp, cusolvermp
+
+
+
 
 ## Topics
 

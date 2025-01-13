@@ -1,21 +1,42 @@
 Alps supports diverse communities and users, each with their own specific software requirements.
 The number of use cases with new requirements continues to grow, to the point where responsibility for providing software environments is distrubuted over more groups.
 
-What each of these groups have in common is that they are working in user-facing roles, typically with the same access rights as users -- that is, they do not have the ability to install software as root.
+What each of these groups have in common is that they are working in user-facing roles, typically with the same access rights as users. Specifically, the support teams do not have the ability to install software as root.
 
-To effectively provide software: end to end responsibility for full stacks; reduce dependence of software stacks on the base image stage; decouple software environments; automate deployment; support users BYO software stack; provide ready-built .
+Ideally the software support team would have end to end responsibility, with the ability to install all software themselves without interrupting the operation of the system, using automated CI/CD pipelines.
+Furthermore, to continue scaling our support to the use cases a vClusters, we need practives and tools that: reduce dependence of software stacks on the base image stage; decouple software environments; automate deployment; and support users who need to bring their own software stack.
 
 There is no silver bullet that meets all requirements.
-For example, HPC containers allow users to bring their own software environments, or bring software stacks built elsewhere -- by supporting containers from the NVIDIA Container Registry (NGC) opens up a lot of opportunity to our use community.
-However, HPC centers provide complicated software stacks for their user communities, for which they develop and maintain workflows based on tools like Spack and EasyBuild.
+To illustrate this, HPC containers allow users to build their own software environments, or bring software stacks built elsewhere -- e.g. if we can run containers from the NVIDIA Container Registry (NGC), many of our ML users will have their requirements met.
+For example, HPC containers allow users bring software stacks built elsewhere, offer excellent isolation between environments, and container runtimes can replace dependencies inside a container, making containerised software resiliant to changes to the underlying system.
+However, HPC centers provide complicated software stacks for their user communities -- for which they develop and maintain workflows based on tools such as Spack and EasyBuild -- 
 
 At CUG23 CSCS presented a paper about \stackinator, a tool that was developed to build isolated software environments as squashfs images.
-This paper gives a brief overview of \stackinator, and a summary of new features and improvements to the tool.
 
 The main focus of this paper will be on how we address the larger challenge above.
-The main tool we use is uenv, however container 
+We start by defining the ``objectives'' of our efforts, with concrete aims 
 
-\subsection{Objective 1: GitOps Deployment}
+\subsection{Objective: provide software optimized for Alps}
+
+Libraries that implement or require inter-node communication need to be optimized for the Slingshot 11 network in Alps.
+
+Two years ago we published the process for installing \craympich using Spack without the CPE.
+
+Also of interest are the \cufftmp and \cusolvermp libraries from NVIDIA, that implement optimized distributed FFT and linear algebra solvers that use \nvshmem for distributed communication.
+
+Popular applications like GROMACS and VASP can be configured to use these libararies for the best performance, however both \cufftmp and \cusolvermp are distributed by NVIDIA as pre-built binaries, intended for use on Infiniband networks.
+
+provide optimized software for the target platform
+
+    * don't use CPE: we don't have control over the versions of software
+    * don't use NVHPC: communication libraries are not tuned for HPE Cray EX (slingshot 11) architecture.
+
+    * integration of NVIDIA software has always been patchy.
+
+\begin{itemize}
+    \item \textbf{aim}: provide cray-mpich, nccl, cufftmp, cusolvermp
+\end{itemize}
+\subsection{Objective: GitOps Deployment}
 
 gitops deployment of user environments/applications/programming environments
 
@@ -24,31 +45,31 @@ manage all descriptions through git and pipelines.
 each environment is an artifact that is not replaced by new versions.
 
 \begin{itemize}
-    \item \textbf{aim:} all uenvs are defined as recipes in a GitHub repository
-    \item \textbf{aim:} a CI/CD pipeline builds and deploys uenv images using triggers on the GitHub repository
-    \item \textbf{aim:} each build generates an artifcat
-    \item \textbf{aim:} images can be rebuilt using the meta data
+    \item \textbf{aim}: all uenvs are defined as recipes in a GitHub repository
+    \item \textbf{aim}: a CI/CD pipeline builds and deploys uenv images using triggers on the GitHub repository
+    \item \textbf{aim}: each build generates an artifact.
+    \item \textbf{aim}: images can be rebuilt using the meta data
 \end{itemize}
 
-\subsection{Objective 2: Decouple environments}
+\subsection{Objective: decouple environments}
 
 update and upgrade environments independently of one another
 provide both long term stability and the latest software (MPI, CUDA, NCCL, libfabric, etc) as soon as it is released.
 
 \begin{itemize}
-    \item \textbf{aim:} existing uenv and workflows based on them are unaffected by releasing new versions of the uenv
-    \item \textbf{aim:} existing uenv are not broken by updates to the underlying system - and if a major upgrade does break them, they can be rebuilt.
-    \item \textbf{aim:} uenv that provide the latest versions of software (including pre-releases of cray-mpich, the latest cuda) can be deployed as soon
+    \item \textbf{aim}: existing uenv and workflows based on them are unaffected by releasing new versions of the uenv
+    \item \textbf{aim}: existing uenv are not broken by updates to the underlying system - and if a major upgrade does break them, they can be rebuilt.
+    \item \textbf{aim}: uenv that provide the latest versions of software (including pre-releases of cray-mpich, the latest cuda) can be deployed asap.
 \end{itemize}
 
-\subsection{the team responsible for supporting software environments should have full responsibility for its deployment}
+\subsection{End to end responsibility for software support teams.}
 
-the team responsible for supporting software environments should have full responsibility for its deployment.
+The team responsible for supporting software environments should have full responsibility for its deployment.
 to create and deploy software should not require root privelages, and should not require any modification to the system itself.
 no update to OS images, no reboot or system administrator / system engineer involvement.
 
 \begin{itemize}
-    \item \textbf{aim:} staff who support applications and PE should have end to end responsibility
-    \item \textbf{aim:} user communities can take control of software deployments using the same tools (MCH, EXCLAIM, ESIWAG CI/CD pipelines)
-    \item \textbf{aim:} individual users can build and share their own uenv images
+    \item \textbf{aim}: staff who support applications and PE should have end to end responsibility
+    \item \textbf{aim}: user communities can take control of software deployments using the same tools (MCH, EXCLAIM, ESIWAG CI/CD pipelines)
+    \item \textbf{aim}: individual users can build and share their own uenv images
 \end{itemize}
