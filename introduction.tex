@@ -13,25 +13,24 @@ However, HPC centers provide complicated software stacks for their user communit
 
 At CUG23 CSCS presented a paper about \stackinator, a tool that was developed to build isolated software environments as squashfs images.
 
+\begin{itemize}
+    \item build: the tools
+    \item deploy:
+    \item use: 
+\end{itemize}
+
 The main focus of this paper will be on how we address the larger challenge above.
 We start by defining the ``objectives'' of our efforts, with concrete aims 
 
-\subsection{Objective: provide software optimized for Alps}
+\subsection{Objective: provide optimized software}
 
-Libraries that implement or require inter-node communication need to be optimized for the Slingshot 11 network in Alps.
+Libraries that implement inter-node communication, for example MPI and NCCL, need to be optimized for the Slingshot 11 network in Alps.
 
-Two years ago we published the process for installing \craympich using Spack without the CPE.
+In CUG23 we published how for installing \craympich using Spack without the CPE.
 
 Also of interest are the \cufftmp and \cusolvermp libraries from NVIDIA, that implement optimized distributed FFT and linear algebra solvers that use \nvshmem for distributed communication.
 
 Popular applications like GROMACS and VASP can be configured to use these libararies for the best performance, however both \cufftmp and \cusolvermp are distributed by NVIDIA as pre-built binaries, intended for use on Infiniband networks.
-
-provide optimized software for the target platform
-
-    * don't use CPE: we don't have control over the versions of software
-    * don't use NVHPC: communication libraries are not tuned for HPE Cray EX (slingshot 11) architecture.
-
-    * integration of NVIDIA software has always been patchy.
 
 \begin{itemize}
     \item \textbf{aim}: provide cray-mpich, nccl, cufftmp, cusolvermp
