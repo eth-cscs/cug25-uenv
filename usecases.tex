@@ -1,0 +1,67 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Use Cases}
+\label{sec:usecases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%------------------------------------------------------------------------------
+\subsection{Standard Environment}
+%------------------------------------------------------------------------------
+
+There are a wealth of high-quality command line tools (e.g. fd, ripgrep and neovim), that are either not installed on HPC systems, or the version provided on the system is out of date or not configured properly (e.g. the version of vim provided by SUSE does not use treesitter).
+
+We use uenv to provide a set of up to date and modern command line tools, that is permanantly mounted on Alps vClusters.
+
+The package includes:
+\begin{itemize}
+    \item \emph{neovim} and \emph{emacs}, built with \emph{treesitter};
+    \item \emph{fd} and \emph{ripgrep} (modern versions of the \lst{find} and \lst{grep} tools);
+    \item \emph{oh-my-posh} (a custom command line prompt);
+    \item programming languages: \emph{lua}, \emph{go}, \emph{rust} and \emph{python}.
+\end{itemize}
+
+The uenv is created using the uenv pipeline, however it is mounted ``permanantly'' via a vService:
+\lstinputlisting[language=bash]{./code/manual-uenv-mount.sh}
+
+Updated sets of tools can deployed without rebooting the system, and rolled back by mounting the old squashfs image if there is a problem.
+It is also simpler to test out a new stack, by switching to the new image on a handful of reserved nodes, before rolling out to the whole system.
+
+%------------------------------------------------------------------------------
+\subsection{JupyterHub}
+%------------------------------------------------------------------------------
+
+CSCS provides a JupyterHub web portal for users to access Alps through Jupyter notebooks, which requires the Jupyter software stack installed on the cluster where the notebook will run.
+The approach taken by CSCS is to create a simple \lst{jupyter} uenv that provides only jupyter, mounted at \lst{/user-tools}.
+
+Two packages are installed, \lst{python} and \lst{py-pip}.
+Then a ``post-install'' script, an optional script that can be used to modify the uenv right before it is compressed into a squashfs image, is used to install jupyter and other dependencies:
+
+\lstinputlisting[language=bash]{code/jupyter-post-install.sh}
+
+This uenv is automatically mounted by the JuputerHub service, alongside a uenv selected by the user, which provides the scientific software required.
+
+%------------------------------------------------------------------------------
+\subsection{Weather Service Production}
+%------------------------------------------------------------------------------
+
+CSCS hosts the operational cluster of The Swiss Weather Service (MeteoSwiss) on Alps -- a system with GPU nodes (4 $\times$ A100 GPU per node) for the weather forecast, and CPU only nodes (2 AMD Xeon CPU per node) for the other tasks in the operational weather forecast pipeline.
+
+MCH require two distinct "programming environments":
+\begin{enumerate}
+    \item \emph{prgenv-nvidia} for building the atmospheric model ICON:
+    \begin{itemize}
+        \item the NVIDIA compiler toolchain, for compiling Fortran+OpenACCw
+        \item libraries (HDF5, netcdf, etc).
+        \item cray-mpich, cuda, etc.
+    \end{itemize}
+    \item \emph{prgenv-gcc} for building everything else:
+    \begin{itemize}
+        \item the gcc compiler toolchain, for compiling C, C++ and Fortran
+        \item libraries (HDF5, netcdf, etc).
+        \item cray-mpich
+        \item python, R and ruby.
+    \end{itemize}
+\end{enumerate}
+A single uenv provides both programming environments, that are configured using modules, views or Spack.
+
+These images are also mounted permanantly, and versioned, e.g the latest version on the system is \lst{/mch-environment/v8}, where it is mounted for testing, while the current production runs are configured to use \lst{/mch-environment/v7}.
+

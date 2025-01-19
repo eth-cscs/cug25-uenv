@@ -1,0 +1,119 @@
+@inproceedings{gamblin:sc15,
+    Address = {Austin, Texas},
+    Author = {Todd Gamblin and Matthew P. LeGendre and Michael R. Collette and Gregory L. Lee and Adam Moody and Bronis R. de Supinski and W. Scott Futral},
+    Booktitle = {Supercomputing 2015 (SC'15)},
+    Month = {November 15-20},
+    Title = {{The Spack Package Manager: Bringing order to HPC software chaos}},
+    Url = {http://tgamblin.github.io/pubs/spack-sc15.pdf},
+    Year = {2015},
+}
+
+@INPROCEEDINGS{
+    paper:arbor2019,
+    author={N. {Abi Akar} and B. {Cumming} and V. {Karakasis} and A. {Küsters} and W. {Klijn} and A. {Peyser} and S. {Yates}},
+    booktitle={2019 27th Euromicro International Conference on Parallel, Distributed and Network-Based Processing (PDP)},
+    title={{Arbor --- A Morphologically-Detailed Neural Network Simulation Library for Contemporary High-Performance Computing Architectures}},
+    year={2019}, month={feb}, volume={}, number={},
+    pages={274--282},
+    doi={10.1109/EMPDP.2019.8671560},
+    ISSN={2377-5750}}
+
+@inproceedings{forai:cug16,
+  title={Making scientific software installation reproducible on Cray systems using EasyBuild},
+  author={Forai, Petar and Hoste, Kenneth and Peretti-Pezzi, Guilherme and Bode, Brett},
+  booktitle={Proceedings of the Cray Users Group Meeting (CUG2016)},
+  year={2016}
+}
+
+@software{
+  software:arbor,
+  author       = {Nora Abi Akar and
+                  John Biddiscombe and
+                  Benjamin Cumming and
+                  Marko Kabic and
+                  Vasileios Karakasis and
+                  Wouter Klijn and
+                  Anne Küsters and
+                  Alexander Peyser and
+                  Stuart Yates and
+                  Thorsten Hater and
+                  Brent Huisman and
+                  Espen Hagen and
+                  Robin De Schepper and
+                  Charl Linssen and
+                  Harmen Stoppels and
+                  Sebastian Schmitt and
+                  Felix Huber and
+                  Max Engelen and
+                  Fabian Bösch and
+                  Jannik Luboeinski and
+                  Simon Frasch and
+                  Lukas Drescher and
+                  Lennart Landsmeer},
+  title        = {Arbor Library v0.8.1},
+  month        = nov,
+  year         = 2022,
+  publisher    = {Zenodo},
+  version      = {v0.8},
+  doi          = {10.5281/zenodo.7473671},
+  url          = {https://doi.org/10.5281/zenodo.7473671}
+}
+
+@software{
+  software:reframe,
+  author       = {Theofilos Manitaras and
+                  Vasileios Karakasis and
+                  Javier Otero and
+                  Eirini Koutsaniti and
+                  Jean-Guillaume Piccinali and
+                  Rafael Sarmiento and
+                  Christopher Bignamini and
+                  Victor Holanda Rusu and
+                  Andreas Jocksch and
+                  Matthias Kraushaar and
+                  Luca Marsella and
+                  Sebastian Keller and
+                  Samuel Omlin and
+                  Sergei Kliavinek and
+                  Henrique Mendonça and
+                  Mosè Giordano and
+                  Mark Turner and
+                  Giuseppe Lo-Re and
+                  Maxime Boissonneault and
+                  Steve Leak and
+                  Mahendra Paipuri and
+                  Vanessa Sochat and
+                  Jean Favre and
+                  Sam Moors and
+                  Zhi-Qiang You and
+                  Åke Sandgren and
+                  Jack Morrison and
+                  Xavier Lapillonne and
+                  Erich Birngruber},
+  title        = {reframe-hpc/reframe: ReFrame 4.2},
+  month        = apr,
+  year         = 2023,
+  publisher    = {Zenodo},
+  version      = {v4.2.0},
+  doi          = {10.5281/zenodo.7853800},
+  url          = {https://doi.org/10.5281/zenodo.7853800}
+}
+
+@article{vClusters2023,
+author = {Sadaf R Alam and Miguel Gila and Mark Klein and Maxime Martinasso and Thomas C Schulthess},
+title ={Versatile software-defined HPC and cloud clusters on Alps supercomputer for diverse workflows},
+journal = {The International Journal of High Performance Computing Applications},
+volume = {0},
+number = {0},
+year = {0},
+doi = {10.1177/10943420231167811},
+}
+
+#@article{uenv2023,
+#author = {Jonathan Coles and Benjamin Donald Cumming and Theofilos-Ioannis Manitaras and Jean-Guillaume Piccinali and and Simon Pintarelli and Harmen Stoppels},
+#title = {Deploying Alternative User Environments on Alps},
+#journal = {CUG 2023},
+#volume = {0},
+#number = {0},
+#year = {2023},
+#}

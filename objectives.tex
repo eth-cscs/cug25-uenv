@@ -1,0 +1,49 @@
+Before describing CSCS solution, we first establish concrete objectives that define the requirements for deploying software on HPC systems. These objectives serve as a framework to evaluate the effectiveness of our proposed solutions. The objectives span technical, operational, and organizational aspects of software deployment.
+
+\subsection{Provide optimized software}
+
+Libraries that implement inter-node communication, for example MPI and NCCL, need to be optimized for the Slingshot 11 network in HPE Cray-EX systems.
+The method used by \stackinator to install \craympich using Spack~\cite{gamblin:sc15} outside the CPE was demonstrated in~\cite{uenv2023} 
+
+To support all applications, we require robust methods for installing packages like OpenMPI, NCCL, \nvshmem, \cufftmp and \cusolvermp and with libfabric support:
+\begin{itemize}
+    \item \textbf{aim}: we can deploy key NVIDIA communication libraries on Slingshot 11.
+    \item \textbf{aim}: we can deploy OpenMPI with Slingshot 11 support.
+    \item \textbf{aim}: build libfabric and CXI from source.
+\end{itemize}
+
+\subsection{Gitops deployment}
+
+With GitOps, infrastructure and environments are defined as code in version control systems like Git.
+This enables automated, reproducible deployments through CI/CD pipelines, while providing transparency, rollback capabilities, and a single source of truth for the entire system configuration.
+
+We define the following criteria for a GitOps workflow for deploying software on a HPC system:
+\begin{itemize}
+    \item \textbf{aim}: all software stacks are defined as test file recipes in a git repository;
+    \item \textbf{aim}: a CI/CD pipeline builds and deploys uenv images using triggers on the git repository;
+    \item \textbf{aim}: each pipeline build deploys an artifact;
+    \item \textbf{aim}: software can be rebuilt from the recipe.
+\end{itemize}
+
+\subsection{Decouple environments}
+
+Many use cases on Alps require stable environments that do not change over the duration of multi-year projects,
+while others require updated versions of the same environments, or frequent rolling release style deployment to keep pace with rapidly changing software stacks (for example ML/AI and development projects).
+%This requires decoupling of software environments, so that new software can be deployed alongside existing software with no side effects, which is summarised with the following aims:
+To support all use cases, the following requirements have to be met:
+\begin{itemize}
+    \item \textbf{aim}: workflows based on a uenv are unaffected by releasing new versions of the uenv;
+    \item \textbf{aim}: minimise the chance that uenv are ``broken'' by updates to the underlying system, while being able to redeploy them quickly if there is a breaking change.
+    \item \textbf{aim}: uenv that provide the latest versions of software (e.g. with pre-releases of cray-mpich or the latest PyTorch version) can be deployed.
+\end{itemize}
+
+\subsection{End to end responsibility for software support teams.}
+
+The team responsible for supporting software environments should have full responsibility for its deployment.
+Building and deploying software should not require root privelages, modification to the system itself or the involvement of system administrators:
+\begin{itemize}
+    \item \textbf{aim}: staff who support applications and programming environments should have end to end responsibility;
+    \item \textbf{aim}: user communities can take control of software deployments using the same tools (MCH, EXCLAIM, ESIWAG CI/CD pipelines);
+    \item \textbf{aim}: individual users can build and share their own uenv images.
+\end{itemize}
+

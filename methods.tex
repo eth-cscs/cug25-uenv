@@ -1,25 +1,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Deployment}
-\label{sec:deployment}
+\section{Methods}
+\label{sec:flow}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-\begin{itemize}
-\item the CI/CD tooling
-\item the command line interface (CLI)
-\item the slurm plugin
-\end{itemize}
+In this section, we present a comprehensive analysis of CSCS's software deployment methodology, following the complete lifecycle from initial software compilation through to end-user interaction.
+We systematically examine three key stages: the building of software components with their specific dependencies and optimizations, the deployment mechanisms across diverse computational environments, and the user interface design that facilitates efficient access to these resources.
+%This structured approach allows us to thoroughly address the complexities inherent in managing scientific software on large-scale HPC systems.
 
 %------------------------------------------------------------------------------
-\section{Stackinator: Building Software}
+\subsection{Building Software: Stackinator}
 %------------------------------------------------------------------------------
 
 %..............................................................................
-\subsection{}
-%..............................................................................
-
-%..............................................................................
-\subsection{OpenMPI}
+\subsubsection{OpenMPI}
 %..............................................................................
 
 \openmpi with support for libfabric is available through uenv on Alps.
@@ -29,7 +22,7 @@ In the paper we will describe how we configure \openmpi with libfabric, and show
 We will also show the recipes for building different versions of the open source distributions of libfabric and the CXI driver from source, and integrating them in a uenv.
 
 %..............................................................................
-\subsection{NVIDIA libraries}
+\subsubsection{NVIDIA libraries}
 %..............................................................................
 
 NVIDIA provide a suite of mathematical and communication libraries for distributed computation.
@@ -52,11 +45,11 @@ The paper will describe in detail how CSCS provides these packages:
 \end{itemize}
 
 %------------------------------------------------------------------------------
-\section{Multi cluster/multi architecture}
+\subsection{Deployment: CI/CD}
 %------------------------------------------------------------------------------
 
 Alps is a HPE Cray EX system, with the five node node types described in \tbl{tab:alps-nodes}.
-On top of the Alps infrastructure, CSCS deploys vClusters (versatile software defined clusters), where each vCluster is a separate SLURM vCluster that is customised for specific platforms.
+On top of the Alps infrastructure, CSCS deploys vClusters~\cite{vClusters2023} (versatile software defined clusters), where each vCluster is a separate SLURM vCluster that is customised for specific platforms.
 
 Each vCluster is configured for different target communities, use cases or customers.
 As such, the version of SLURM, mounted file systems and installed software can vary between vClusters.
@@ -95,7 +88,7 @@ mi200   & AMD MI250x   & 12      & 24     & 24          & 96          \\
 \end{table*}
 
 %------------------------------------------------------------------------------
-\section{The uenv CLI}
+\section{User Experience: CLI and SLURM}
 %------------------------------------------------------------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -124,6 +117,11 @@ srun --environment=cpe/24.11 --pty bash
 \section{Other Applications}
 
 In this section we explore some special applications of uenv, that we use to enable specific workflows.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Use Cases}
+\label{sec:usecases}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %------------------------------------------------------------------------------
 \subsection{Standard Environment}

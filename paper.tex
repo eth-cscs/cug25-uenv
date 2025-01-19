@@ -52,7 +52,7 @@
 }
 \begin{document}
 
-\title{No More CPE on Alps}
+\title{Modern Software Deployment on a Multi-Tenant Cray-EX System}
 
 \author{
     \IEEEauthorblockN{Jonathan Coles}
@@ -66,33 +66,28 @@
         Zurich, Switzerland \\
         bcumming@cscs.ch}
     \and
-    \IEEEauthorblockN{Theofilos-Ioannis Manitaras}
+    \IEEEauthorblockN{Andreas Fink}
     \IEEEauthorblockA{
         \textit{CSCS}\\
         Lugano, Switzerland \\
-        theofilos.manitaras@cscs.ch}\\
-    \IEEEauthorblockN{Jean-Guillaume Piccinali}
+        andreas.findk@cscs.ch}\\
+    \IEEEauthorblockN{Mikael Simberg}
     \IEEEauthorblockA{
         \textit{CSCS}\\
         Lugano, Switzerland \\
-        jgp@cscs.ch}
+        mikael.simberg@cscs.ch}
     \and
     \IEEEauthorblockN{Simon Pintarelli}
     \IEEEauthorblockA{
         \textit{CSCS}\\
         Zurich, Switzerland \\
-        simon.pintarelli@cscs.ch}\\
-    \IEEEauthorblockN{Harmen Stoppels}
-    \IEEEauthorblockA{
-        \textit{Stoppels Consulting/LLNL}\\
-        Zurich, Switzerland \\
-        harmen@stoppels.ch}
+        simon.pintarelli@cscs.ch}
 }
 
 \maketitle
 
 \begin{abstract}
-\input{abstract.tex}
+    \input{abstract.tex}
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -102,14 +97,43 @@ CPE, spack, squashfs, slurm, gitops
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 \label{sec:introduction}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input{introduction.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\input{extended-abstract.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Objectives}
+\label{sec:objectives}
+\input{objectives.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Methods}
+\label{sec:methods}
+\input{methods-abstract.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{CPE in a Container}
+\label{sec:cpe}
+\input{cpe-in-a-container.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Use Cases}
+\label{sec:usecases}
+\input{usecases-abstract.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Discussion}
+\label{sec:discussion}
+\input{discussion.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %*************************************************
-%\bibliographystyle{abbrv}
-%\bibliography{paper}
+\bibliographystyle{abbrv}
+\bibliography{refs}
 %*************************************************
 
 \end{document}

@@ -1,15 +1,13 @@
-#TEXFILES=abstract.tex  deployment.tex  introduction.tex  paper.tex  results.tex  spack-stacks.tex listing-spec.tex
-TEXFILES=paper.tex
+TEXFILES=paper.tex introduction.tex objectives.tex abstract.tex methods-abstract.tex usecases-abstract.tex discussion.tex
 
 all: paper.pdf
 
-paper.pdf : $(TEXFILES) $(IMAGEFILES) bibup
+paper.pdf : $(TEXFILES) paper.bbl
 	pdflatex paper
 
-#bibup : paper.bib
-bibup :
+paper.bbl : $(TEXFILES) refs.bib
 	pdflatex paper
-	#bibtex paper
+	bibtex paper
 	pdflatex paper
 
 force : paper.pdf
@@ -29,4 +27,4 @@ clean :
 	rm -f *.vrb
 	rm -f *.toc
 
-.PHONY: bibup force clean all
+.PHONY: force clean all
