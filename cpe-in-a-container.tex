@@ -1,8 +1,8 @@
-CSCS provides CPE as an environment on Alps, however installing and updating CPE requires root permission to rebuilding node image and reboot nodes with the new image, and updating the installation of CPE can break user-installed software built on top of the CPE.
+Installing and updating CPE requires root permission to rebuilding node image and reboot nodes with the new image, and updating the installation of CPE can break user-installed software built on top of the CPE.
 This is in opposition to the objective of giving support staff the ability to deploy software stacks without root or interruption to the system.
 
-CSCS provides CPE in a container, because containers can be built using by users with Podman and deployed without modifying the cluster, and the new container does not affect previously deployed CPE containers.
-Building CPE containers and deploying them is possible because of two developments:
+CSCS continues to provide CPE via containers, built without root permission using Podman, deployed without modifying the cluster, and without removing previously deployed CPE containers.
+This approach is possible due to two developments:
 \begin{itemize}
        \item Alps uses forks of the \href{https://github.com/NVIDIA/enroot}{enroot} container runtime and \href{https://github.com/NVIDIA/pyxis}{Pyxis} Slurm plugin to make using
        \item HPE have improved the modularity of CPE packages, and started releasing them through a new \href{https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html}{RPM repository} that can be used directly in Dockerfiles.
