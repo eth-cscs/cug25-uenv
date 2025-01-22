@@ -6,6 +6,7 @@ A uenv that provides up to date and modern command line tools, can be mounted on
 The package includes editors (e.g. \emph{neovim} and \emph{emacs}), search tools (e.g. \emph{fd} and \emph{ripgrep}), and up to date programming language tools (\emph{lua}, \emph{go}, \emph{rust} and \emph{python}).
 
 The uenv is mounted on the nodes using the equivalent to the following command:
+\vfill\eject
 \lstinputlisting[language=bash]{./code/manual-uenv-mount.sh}
 using a service that can update the mounted image without rebooting the node.
 
@@ -22,8 +23,8 @@ This uenv is automatically mounted by the JuputerHub service, alongside a uenv s
 %------------------------------------------------------------------------------
 
 CSCS hosts the operational cluster of The Swiss Weather Service (MeteoSwiss) on Alps -- a system with GPU nodes (4 $\times$ A100 GPU per node) for the weather forecast, and CPU only nodes (2 AMD Xeon CPU per node) for the other tasks in the operational weather forecast pipeline.
-The MetosSwiss pipeline requires two distinct software stacks: an NVHPC stack for their Fortran+OpenACC ICON application; and a GNU toolchain for the other applications in the workflow.
-Both stacks are implemented in one uenv, that is mounted permanantly at \lst{/mch-environment}.
+The MeteoSwiss pipeline requires two distinct software stacks: an NVHPC stack for their Fortran+OpenACC ICON application; and a GNU toolchain for the other applications in the workflow.
+Both stacks are implemented in one uenv, that is mounted permanently at \lst{/mch-environment}.
 
 Due to their strict operational requirements, MCH are naturally very conservative and cautious.
 Using uenv has been beneficial because to test a new operational environment the CLI and SLURM plugin can be used to create a session with the new stack mounted on the current stack to perfectly replicate what the permanent deployment would look like.

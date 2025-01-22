@@ -1,22 +1,21 @@
 Alps supports diverse communities on multiple tenants, each with their own specific software requirements.
-The combination of tenants and use cases requires that distrubuted responsibility for providing and supporting software environments to many individuals and teams inside CSCS.
-These support staff work in user-facing roles without root access.
+The combination of tenants and use cases requires distributing responsibility for providing and supporting software environments to many individuals and teams inside CSCS.
 
 Ideally software support staff would have end to end responsibility: the ability to install all software as users without interrupting the operation of the system, using automated CI/CD pipelines.
 Furthermore, to continue scaling support to more use cases and systems, the tooling and methods used need to: reduce dependence of software stacks on the base OS image installed on each tenant; decouple software environments; automate deployment; and support users who need to provide their own software stacks.
 
 CSCS has found that there is no silver bullet that meets all of these requirements.
-For example, HPC containers allow users bring software stacks built elsewhere, offer excellent isolation between environments, and container runtimes can inject optimized communication libraries which makes containerised software resiliant to changes to the underlying system.
+For example, HPC containers allow users bring software stacks built elsewhere, offer excellent isolation between environments, and container runtimes can inject optimized communication libraries which makes containerised software resilient to changes to the underlying system.
 But supporting containers alone is not sufficient -- we also need to provide software optimised for the target platform, and support users building their own optimized containers.
 
-At CUG23 CSCS presented \stackinator~\cite{uenv2023}, a tool for building isolated and reproducible software environments as squashfs images called uenv, optimized for Cray EX hardware.
+At CUG23 CSCS presented \stackinator~\cite{uenv2023}, a tool for building isolated and reproducible software environments as Squashfs images called uenv, optimized for Cray EX hardware.
 This paper focusses on the full end to end process and tooling that CSCS has developed to deploy uenv, how users interact with them, and their impact on support staff.
 
-In \sect{sec:objectives} the requirements discussed above will be enumerated as objectives with measureable aims.
+In \sect{sec:objectives} the requirements discussed above will be enumerated as objectives with measurable aims.
 Then the tools and processes used to achieve our objectives will be introduced in three stages: building environments; deploying environments; and the user experience for users of the deployed environments in \sect{sec:methods}.
 How CSCS continues to provide CPE as a container, with recipes and lessons learnt for building CPE in a container will be covered in \sect{sec:cpe}.
 Finally we will describe some interesting use cases for uenv in \sect{sec:usecases}, and discuss the maintenance overheads and issues with our approach in~\sect{sec:discussion}.
 
-The topics of interest to the CUG audience covered in this paper include: providing libraries like OpenMPI and NVIDIA software stack optimized for Slingshot; reproducible HPC sofware envrionments; using containers to deploy CPE; and modernising the deployment of software on HPC systems.
+The topics of interest to the CUG audience covered in this paper include: providing libraries like OpenMPI and NVIDIA software stack optimized for Slingshot; reproducible HPC software environments; using containers to deploy CPE; and modernising the deployment of software on HPC systems.
 Some of the implementation is CSCS-specific, however all of the software and pipelines are in permissibly licensed open source repositories that can be used as is, or used for tips and guidance in developing other sites' solutions.
 

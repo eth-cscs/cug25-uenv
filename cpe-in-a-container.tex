@@ -4,8 +4,8 @@ This is in opposition to the objective of giving support staff the ability to de
 CSCS continues to provide CPE via containers, built without root permission using Podman, deployed without modifying the cluster, and without removing previously deployed CPE containers.
 This approach is possible due to two developments:
 \begin{itemize}
-       \item Alps uses forks of the \href{https://github.com/NVIDIA/enroot}{enroot} container runtime and \href{https://github.com/NVIDIA/pyxis}{Pyxis} Slurm plugin to make using
-       \item HPE have improved the modularity of CPE packages, and started releasing them through a new \href{https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html}{RPM repository} that can be used directly in Dockerfiles.
+       \item Alps uses forks of the \href{https://github.com/NVIDIA/enroot}{enroot} container runtime and \href{https://github.com/NVIDIA/pyxis}{Pyxis} Slurm plugin to provide an integrated container solution.
+       \item HPE have improved the modularity of CPE packageing, and started releasing them through a new \href{https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html}{RPM repository} that can be used directly in Dockerfiles.
 \end{itemize}
 
 %The benefits of deploying CPE in a container include:
