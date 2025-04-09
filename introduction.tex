@@ -1,4 +1,5 @@
-Alps supports diverse communities on multiple tenants, each with their own specific software requirements.
+A differentiating feature of Alps comparted to other HPE Cray-EX deployments is how multi-tenancy is implemented and supported.
+Instead of deploying a single large SLURM cluster, the system is partitioned into non-overlapping SLURM and Kubernetes clusters, each customised for specific use cases and community requirements.
 The combination of tenants and use cases requires distributing responsibility for providing and supporting software environments to many individuals and teams inside CSCS.
 
 Ideally software support staff would have end to end responsibility: the ability to install all software as users without interrupting the operation of the system, using automated CI/CD pipelines.

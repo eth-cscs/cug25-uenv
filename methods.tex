@@ -1,186 +1,141 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Methods}
-\label{sec:flow}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 In this section, we present a comprehensive analysis of CSCS's software deployment methodology, following the complete lifecycle from initial software compilation through to end-user interaction.
-We systematically examine three key stages: the building of software components with their specific dependencies and optimizations, the deployment mechanisms across diverse computational environments, and the user interface design that facilitates efficient access to these resources.
+We examine three key stages: the building of software components with their specific dependencies and optimizations, the deployment mechanisms across diverse computational environments, and the CLI and SLURM tools that provide these environments to users.
 %This structured approach allows us to thoroughly address the complexities inherent in managing scientific software on large-scale HPC systems.
 
 %------------------------------------------------------------------------------
 \subsection{Building Software: Stackinator}
 %------------------------------------------------------------------------------
 
-%..............................................................................
-\subsubsection{OpenMPI}
-%..............................................................................
+The  \stackinator tool, that is used to generate squashfs images from a YAML-based recipe, was documented in detail at CUG 2023~\cite{uenv2023}.
+The implementation details of \stackinator were covered in that paper, and have not changed materially.
+The method used by \stackinator to install \craympich using Spack~\cite{gamblin:sc15} outside the CPE was demonstrated was shown in~\cite{uenv2023} 
+This approach is used by \stackinator, however it can also be used directly with Spack -- CSCS staff use it to install the most recent versions of \craympich on LUMI.
 
-\openmpi with support for libfabric is available through uenv on Alps.
-The main motivation behind providing it is to have an alternative to \craympich, for when \craympich has application-specific performance problems or bugs, or users want to install a pre-compiled application that was linked against \openmpi.
+\todo{add some more color about stackinator: changes since 2023; per-stack spack versioning; site repo; how all this minimises the Spack upgrade pain.}
 
-In the paper we will describe how we configure \openmpi with libfabric, and show performance results in applications up to thousands of Grace-Hopper GPUs.
-We will also show the recipes for building different versions of the open source distributions of libfabric and the CXI driver from source, and integrating them in a uenv.
 
-%..............................................................................
-\subsubsection{NVIDIA libraries}
-%..............................................................................
+\todo{providing libfabric, cxi, cassini}
 
-NVIDIA provide a suite of mathematical and communication libraries for distributed computation.
-Application developers are integrating these libraries, where they are required for the best performance
+\todo{OpenMPI}
 
-In particular, the \cufftmp and \cusolvermp libraries implement optimized distributed FFT and linear algebra solvers.
-Examples of important applications that require these libraries for optimal performance are \cufftmp in GROMACS and \cusolvermp in VASP.
-These two libraries use \nvshmem for distributed communication.
-\nvshmem creates a global address space for data that spans the memory of multiple GPUs (both inter-node and intra-node) athat can be accessed via GPU-initiated operations.
+\todo{NVIDIA libraries}
 
-Both \cufftmp and \cusolvermp are distrbuted as pre-compiled binary distributions.
-\cufftmp in particular is challenging, because it is only distributed inside the NVIDIA HPC SDK, where it is linked against communication libraries that target UCX/Infiniband, not libfabric/Slingshot.
+This section will focus on Spack packing for other key libraries that implement inter-node communication -- for example MPI, NCCL and \nvshmem -- need to be optimized for the Slingshot 11 network in HPE Cray-EX systems.
 
-The paper will describe in detail how CSCS provides these packages:
-\begin{itemize}
-    \item create a custom spack package to the latest version \nvshmem with support for libfabric/Slingshot 11.
-    \item extract \cufftmp from the NVIDIA HPC SDK.
-    \item write Spack packages that install \cufftmp and \cusolvermp and patch them to use \nvshmem built for libfabric.
-    \item customise the Spack packages for GROMACS.
-\end{itemize}
+We will focus on three main sets of libraries. The first is building OpenMPI with libfabric support, in order to provide an alternative to \craympich when there are bugs or performance regressions for specific applications, and to support software that is distributed as binaries linked against OpenMPI. The second is how to build the open source libfabric and CXI driver software for Slingshot 11. Finally, we will show how we adapt \cufftmp and \cusolvermp, which are distributed as pre-build binaries for infiniband, to use \nvshmem with libfabric support, which we developed in collaboration with NVIDIA.
+
+Note that while these methods are integrated into Stackinator, they can be used directly by Spack. All Spack packages, scripts and guides will be made available on GitHub for readers to use.
 
 %------------------------------------------------------------------------------
 \subsection{Deployment: CI/CD}
 %------------------------------------------------------------------------------
 
-Alps is a HPE Cray EX system, with the five node node types described in \tbl{tab:alps-nodes}.
-On top of the Alps infrastructure, CSCS deploys vClusters~\cite{vClusters2023} (versatile software defined clusters), where each vCluster is a separate SLURM vCluster that is customised for specific platforms.
+Alps has five node node types described in \tbl{tab:alps-nodes}, on top of which CSCS creates vClusters\footnote{Versatile software defined cluster}~\cite{vClusters2023}, where each vCluster is a separate SLURM cluster that is customised for a tenant.
+As such, the version of SLURM, mounted file systems and software installed in the OS image (including libfabric) can vary between vClusters.
 
-Each vCluster is configured for different target communities, use cases or customers.
-As such, the version of SLURM, mounted file systems and installed software can vary between vClusters.
-Of particular interest to uenv, the version of \xpmem and \libfabric) installed on the system.
-
-The following characteristics define a uenv
-\begin{itemize}
-    \item name: the name of the uenv
-    \item version: the version of the uenv
-    \item tag: used to indicate multiple releases of the same uenv
-    \item uarch: the node type for which the image is built
-    \item system: the vCluster for which the image is built
-\end{itemize}
-
-For example: \lst{prgenv-gnu/24.7:v1\%gh200@daint}
-
-Is the gnu programming environment, version 24.7, tag v1, built for the Grace-Hopper nodes on Daint.
-
-\begin{table*}[h!]
-\centering
-\begin{tabular}{llrrrr}
-\toprule
-uarch   & type         & blades & nodes & CPU sockets & GPU devices \\
-\midrule
-gh200   & NVIDIA GH200 & 1,344   & 2,688  & 10,752      & 10,752      \\
-zen2    & AMD Rome     & 256     & 1,024  & 2,048       & --          \\
-a100    & NVIDIA A100  & 72      & 144    & 144         & 576         \\
-mi300   & AMD MI300A   & 64      & 128    & 512         & 512         \\
-mi200   & AMD MI250x   & 12      & 24     & 24          & 96          \\
-\midrule
-\multicolumn{2}{c}{\textsc{Total}}      & 1,748   & 3,880  & 13,480  & 11,936 \\
-\bottomrule
-\end{tabular}
-\caption{Alps node types and their specifications.}
+\begin{table*}[!htb]
+    \begin{minipage}{0.6\textwidth}
+        \centering
+        \begin{tabular}{llrrrr}
+        \toprule
+        uarch   & type         & blades & nodes & CPU sockets & GPU devices \\
+        \midrule
+        gh200   & NVIDIA GH200 & 1,344   & 2,688  & 10,752      & 10,752      \\
+        zen2    & AMD Rome     & 256     & 1,024  & 2,048       & --          \\
+        a100    & NVIDIA A100  & 72      & 144    & 144         & 576         \\
+        mi300   & AMD MI300A   & 64      & 128    & 512         & 512         \\
+        mi200   & AMD MI250x   & 12      & 24     & 24          & 96          \\
+        \midrule
+        \multicolumn{2}{c}{\textsc{Total}}      & 1,748   & 3,880  & 13,480  & 11,936 \\
+        \bottomrule
+        \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{0.4\textwidth}
+        \centering
+        \begin{tabular}{lll}
+        \toprule
+        tenant   & vCluster & uarch         \\
+        \midrule
+            ML      & Clariden & gh200 \\
+            ML      & Bristen  & a100 \\
+            HPC     & Daint    & gh200 \\
+            HPC     & Eiger    & zen2 \\
+            Climate & Santis   & gh200  \\
+            MetoSwiss & Balfrin   & a100 and zen2  \\
+        \bottomrule
+        \end{tabular}
+    \end{minipage}
+    \caption{Alps node types and their specifications (left), and examples of vClusters provided to tenants (right).}
 \label{tab:alps-nodes}
 \end{table*}
 
-%------------------------------------------------------------------------------
-\section{User Experience: CLI and SLURM}
-%------------------------------------------------------------------------------
+Over the last two years uenv have proven to be portable between vClusters with the same microarchitecture, and we continue to further reduce the dependence on the underlying OS image, which will also help improve long-term stability of software stacks.
+However, to deploy a uenv to a vCluster we still require that it be built on a compute node of the target vCluster to avoid the need for cross compilation, and to ensure that dependencies like libfabric and Slurm are correctly handled.
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Providing CPE}
-\label{sec:cpe}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-Though CPE is not used as the foundation of software environments, the CPE itself is an environment that we want to provide to users of Alps.
-
-HPE has been making good progress improving the modularity of the CPE and providing more flexible methods of installing the CPE.
-
-This section will describe how CSCS takes advantage of these efforts to provide ``CPE in a container", that delivers a familiar CPE user experience, while addressing the key challenges:
-
+Manually building and deploying uenv images would be tedious and error prone.
+We use a CI/CD pipeline 
 \begin{itemize}
-\item CPE containers can be built, tested and deployed by the support team without root access;
-\item New releases, custom configurations and patched releases of CPE can be deployed without any changes to the underlying system or interruption to service;
-\item Using a container engine with full integration with SLURM simplifies the user experience
+    \item The uenv image recipes (YAML files) are maintained in a GitHub repository.
+    \item Comments on pull requests trigger a pipeline that builds and tests the uenv image: e.g \lst{system=daint;uarch=gh200;uenv=vasp:v6.5.0}
+    \item A GitLab runner that launches build and test stages on the target cluster.
+    \item A ReFrame test suite that selects the appropriate tests to run after building the uenv.
 \end{itemize}
 
-With the integrated container engine on Alps, starting a job with a container mounted is straightforward.
-For example, to start an interactive shell on a compute node with a specific release of CPE loaded:
+\todo{expand the points below. Provide an example of the oras commands used to push, pull and attach meta data}
+
+The build pipeline generates two artifacts: a squashfs image and image meta data, which are pushed to an on-premises container registry.
+The registry is provided by JFrog\footnote{\href{https://jfrog.com}{\lst{jfrog.com}}}, and Oras\footnote{\href{https://oras.land}{\lst{oras.land}}} is used to push and pull images, so any DockerHub API compatible registry would work.
+The images are stored in a \lst{build} namespace, with a tag that corresponds to the unique id of the CI/CD job that built the image, for example:
 \begin{lstlisting}
-srun --environment=cpe/24.11 --pty bash
+jfrog.svc.cscs.ch/uenv/build/daint/gh200/vasp/v6.5.0:1631426005
 \end{lstlisting}
 
-\section{Other Applications}
+The final deployment is manual, because we find that it is often necessary to first perform additional testing such as providing the image to selected users for validation.
+Deployment is performed using the CLI tool (see \sect{sec:cli}):
+\begin{lstlisting}
+uenv image copy build::vasp:1631426005 \
+                deploy::vasp/v6.5.0:v1@daint
+\end{lstlisting}
+Once deployed, the image is available for users to pull and run.
 
-In this section we explore some special applications of uenv, that we use to enable specific workflows.
+Users can also use the same build pipeline to build their own uenv from a recipe from anywhere on the CSCS network:
+\begin{lstlisting}
+> uenv build myapp/v1.2@daint%gh200 <recipe-path>
+Log         : https://cicd-ext-mw.cscs.ch/ci/uenv/
+build?image=cu3upvpoag1s73eo3n80-3690753405420143
+Status      : submitted
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Use Cases}
-\label{sec:usecases}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%------------------------------------------------------------------------------
-\subsection{Standard Environment}
-%------------------------------------------------------------------------------
-
-There are a wealth of high-quality command line tools (e.g. fd, ripgrep and neovim), that are either not installed on HPC systems, or the version provided on the system is out of date or not configured properly (e.g. the version of vim provided by SUSE does not use treesitter).
-
-We use uenv to provide a set of up to date and modern command line tools, that is permanantly mounted on Alps vClusters.
-
-The package includes:
-\begin{itemize}
-    \item \emph{neovim} and \emph{emacs}, built with \emph{treesitter};
-    \item \emph{fd} and \emph{ripgrep} (modern versions of the \lst{find} and \lst{grep} tools);
-    \item \emph{oh-my-posh} (a custom command line prompt);
-    \item programming languages: \emph{lua}, \emph{go}, \emph{rust} and \emph{python}.
-\end{itemize}
-
-The uenv is created using the uenv pipeline, however it is mounted ``permanantly'' via a vService:
-\lstinputlisting[language=bash]{./code/manual-uenv-mount.sh}
-
-Updated sets of tools can deployed without rebooting the system, and rolled back by mounting the old squashfs image if there is a problem.
-It is also simpler to test out a new stack, by switching to the new image on a handful of reserved nodes, before rolling out to the whole system.
+Destination
+Registry    : jfrog.svc.cscs.ch/uenv
+Namespace   : service
+Label       : myapp/v1.2:1626811672@daint%gh200
+\end{lstlisting}
+where \lst{recipe-path} is the YAML recipe.
+The link can be used to check the status of the image, and once the image has been built the user can pull it:
+\begin{lstlisting}
+uenv image pull service::myapp/v1.2:1626811672
+\end{lstlisting}
 
 %------------------------------------------------------------------------------
-\subsection{JupyterHub}
+\subsection{User Experience: CLI and SLURM}
+\label{sec:cli}
 %------------------------------------------------------------------------------
 
-CSCS provides a JupyterHub web portal for users to access Alps through Jupyter notebooks, which requires the Jupyter software stack installed on the cluster where the notebook will run.
-The approach taken by CSCS is to create a simple \lst{jupyter} uenv that provides only jupyter, mounted at \lst{/user-tools}.
+CSCS provides a command line tool for users to manage uenv images, and start sessions; and a SLURM plugin that for integrating uenv into jobs.
+The tools are written in C++, with a common library shared by both implementations, in an open source GitHub repository\footnote{\href{https://github.com/eth-cscs/uenv2}{\lst{github.com/eth-cscs/uenv2}}}.
+Static binary and .so file, with CI/CD that build RPMs ready to install on HPE systems.
 
-Two packages are installed, \lst{python} and \lst{py-pip}.
-Then a ``post-install'' script, an optional script that can be used to modify the uenv right before it is compressed into a squashfs image, is used to install jupyter and other dependencies:
+The uenv command line tool (uenv CLI) allows users to interact with and manage uenv images.
+Below is an example workflow where a user first discovers which images are available, downloads an image, then runs a shell with the image running.
 
-\lstinputlisting[language=bash]{code/jupyter-post-install.sh}
+\lstinputlisting[language=bash]{code/uenv-examples.sh}
 
-This uenv is automatically mounted by the JuputerHub service, alongside a uenv selected by the user, which provides the scientific software required.
+The uenv provide interfaces called views, that set environment variables.
+The \emph{modules} view will load modules, the \emph{spack} view simplifies using Spack to build software on top of the packages provided in the uenv, and uenv authors can also provide custom views that make subsets of the software in the uenv available.
 
-%------------------------------------------------------------------------------
-\subsection{Weather Service Production}
-%------------------------------------------------------------------------------
+The SLURM plugin integrates support for mounting uenv images and configuring the environment.
+A default uenv can be set using \lst{#SBATCH --uenv} that provides the uenv inside the sbatch script, and loads it by default for every srun call.
+The uenv can also be specified using the \lst{srun --uenv}, for example:
+\lstinputlisting[language=bash]{code/uenv-slurm.sh}
 
-CSCS hosts the operational cluster of The Swiss Weather Service (MeteoSwiss) on Alps -- a system with GPU nodes (4 $\times$ A100 GPU per node) for the weather forecast, and CPU only nodes (2 AMD Xeon CPU per node) for the other tasks in the operational weather forecast pipeline.
-
-MCH require two distinct "programming environments":
-\begin{enumerate}
-    \item \emph{prgenv-nvidia} for building the atmospheric model ICON:
-    \begin{itemize}
-        \item the NVIDIA compiler toolchain, for compiling Fortran+OpenACCw
-        \item libraries (HDF5, netcdf, etc).
-        \item cray-mpich, cuda, etc.
-    \end{itemize}
-    \item \emph{prgenv-gcc} for building everything else:
-    \begin{itemize}
-        \item the gcc compiler toolchain, for compiling C, C++ and Fortran
-        \item libraries (HDF5, netcdf, etc).
-        \item cray-mpich
-        \item python, R and ruby.
-    \end{itemize}
-\end{enumerate}
-A single uenv provides both programming environments, that are configured using modules, views or Spack.
-
-These images are also mounted permanantly, and versioned, e.g the latest version on the system is \lst{/mch-environment/v8}, where it is mounted for testing, while the current production runs are configured to use \lst{/mch-environment/v7}.
+\todo{The paper will describe the implementation in more detail, and demonstrate how the tools are used to support diverse workflows.}
