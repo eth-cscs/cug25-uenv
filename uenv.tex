@@ -1,6 +1,42 @@
-CSCS provides a command line tool for users to manage uenv images, and start sessions; and a SLURM plugin that for integrating uenv into jobs.
-The tools are written in C++, with a common library shared by both implementations, in an open source GitHub repository\footnote{\href{https://github.com/eth-cscs/uenv2}{\lst{github.com/eth-cscs/uenv2}}}.
+A command line tool called \emph{uenv} is used to interact with the SquashFS images.
+
+CSCS provides a command line tool for users to manage uenv images, and start sessions.
+
+The uenv tool is written in C++, with a library that is also shared with the SLURM plugin discussed in \sect{sec:slurm}.
+Source code is available in an open source GitHub repository\footnote{\href{https://github.com/eth-cscs/uenv2}{\lst{github.com/eth-cscs/uenv2}}}.
+
+
 Static binary and .so file, with CI/CD that build RPMs ready to install on HPE systems.
+
+%---------------------------------------------------
+\miniheader{Squashfs-Mount}
+
+Non-privileged users are able to mount SquashFS images at runtime using the \lst{squashfs-mount} command line utility, which is a small \lst{setuid} executable that creates a new mount namespace, mounts the SquashFS file through \lst{libmount}, drops privileges and executes a given command.
+This procedure is very similar to SquashFS-based HPC container runtimes such as Apptainer and Sarus.
+
+The following example starts a bash shell with the Squashfs files \lst{img1.sqfs} and \lst{img2.sqfs} are mounted at \lst{/mnt1} and \lst{/mnt2} respectively:
+\lstinputlisting[language=bash]{code/squashfs-mount.sh}
+
+The utility is open source, \href{https://github.com/eth-cscs/squashfs-mount}{available on GitHub} and includes RPMs for installation on Cray EX.
+
+%---------------------------------------------------
+\miniheader{Image Management}
+
+uenv images are stored in a \emph{repository} -- a directory with an sqlite database at the root, and uenv images stored in an images sub-directory:
+
+%\begin{figure}[htp!]
+\input{code/repo-path.tex}
+%\caption{caption text.}
+%\label{fig:repo-path}
+%\end{figure}
+
+Each image is stored in a path that matches its hash, with the following information:
+\begin{itemize}
+\item  \lstinline{store.squashfs}: the SquashFS file;
+\item  \lstinline{env.json}: information about the mount point, uenv description, and view discriptions (their name, and the environment variable updates that they aplly).
+\item  \lstinline{recipe}: the original recipe used to build the image;
+\item  \lstinline{extra/reframe.yaml}: description of the testable features the uenv implements, and how to configure the environment to test them.
+\end{itemize}
 
 The uenv command line tool (uenv CLI) allows users to interact with and manage uenv images.
 Below is an example workflow where a user first discovers which images are available, downloads an image, then runs a shell with the image running.
@@ -10,9 +46,42 @@ Below is an example workflow where a user first discovers which images are avail
 The uenv provide interfaces called views, that set environment variables.
 The \emph{modules} view will load modules, the \emph{spack} view simplifies using Spack to build software on top of the packages provided in the uenv, and uenv authors can also provide custom views that make subsets of the software in the uenv available.
 
-The SLURM plugin integrates support for mounting uenv images and configuring the environment.
-A default uenv can be set using \lst{#SBATCH --uenv} that provides the uenv inside the sbatch script, and loads it by default for every srun call.
-The uenv can also be specified using the \lst{srun --uenv}, for example:
-\lstinputlisting[language=bash]{code/uenv-slurm.sh}
+%---------------------------------------------------
+\miniheader{Deployment}
 
-\todo{The paper will describe the implementation in more detail, and demonstrate how the tools are used to support diverse workflows.}
+%---------------------------------------------------
+\miniheader{Lessons Learnt}
+
+The first version of uenv was written in Python, and was able to modify the calling environment similarly to modules.
+For example, the following command would set environment variables for a uenv that was running:
+\lstinputlisting[language=bash]{code/uenv-old-view.sh}
+
+A full rewrite of uenv was conducted, based on the lessons learnt from this first version.
+
+The first lesson, which is somewhat subjective, is that Python was not an ideal language for deploying to production for the following reasons:
+\begin{itemize}
+    \item the call to Python was designed to use Python 3.6 installed as part of SUSE, and had to be isolated;
+    \item the project was deployed as a set of directories containing the Python implementating
+    \item language features like the lack of type safety and exception-based error handling made implementing a robust, error-free code difficult as the size of the implementation increased.
+\end{itemize}
+
+This was simplified greatly by installing a single statically-linked C++ executable, written in C++20 to take advantage of modern language features for error handling, filesystem operations, and sanitizers.
+
+The second lesson was that being able to modify the calling environment over-complicated the implementation, and enabled some bad practices.
+
+In order to modify the calling environment, the \lstinline{uenv} command was bash function that forwarded the arguments to the Python implementation: \lstinline{echo "$($UENV_CMD $flags "$@")"}, where \lstinline{UENV_CMD} is the path of the implementation.
+The implementation would process the arguments, and print a series of shell commands to stdout, which the calling bash function would then exec.
+
+For example, the command \lstinline{uenv view default} would lead to the following commands being echoed:
+\lstinputlisting[language=bash]{code/uenv-old-echo.sh}
+
+The wrapper-based implementation made it difficult to debug, required further wrappers inside calls to \lstinline{uenv start} and \lstinline{uenv run}, and made support for different shells difficult -- the original implementation only supported bash.
+The new implementation only allows setting views when the uenv is loaded, which is performed by creating a new \lstinline{const char* environ} array that defines the new environment, and forwarding this to \lstinline{execvpe}.
+This has the benefits:
+\begin{itemize}
+    \item the implementation is significantly simplified;
+    \item it is shell agnostic - there is no bash-specific code anywhere in the implementation.
+\end{itemize}
+
+The final benefit is more subtle: specifying the target environment up front is declarative.
+User tickets are easier to debug because the views they are loading are explicitly listed as flags to the uenv call, and all environment modifications are captured in the logs of the \lstinline{uenv start}, \lstinline{uenv run} or SLURM \lstinline{srun --uenv=? --view=?} calls.

@@ -1,0 +1,4 @@
+The SLURM plugin integrates support for mounting uenv images and configuring the environment.
+A default uenv can be set using \lst{#SBATCH --uenv} that provides the uenv inside the sbatch script, and loads it by default for every srun call.
+The uenv can also be specified using the \lst{srun --uenv}, for example:
+\lstinputlisting[language=bash]{code/uenv-slurm.sh}
