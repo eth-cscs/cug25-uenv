@@ -11,7 +11,42 @@ In this section we will provide detailed instructions on how CSCS builds CPE con
 \subsection{Creating CPE containers}
 \label{sec:cpe-container-create}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Getting access to the RPM repository provided by HPE one needs an HPE Passport account, and generate a token\footnote{\href{https://cpe.ext.hpe.com/docs/latest/install/token-authed-repo.html}{\lst{cpe.ext.hpe.com/docs/latest/install/token-authed-repo.html}}}.
+\todo{full link as footnote? fake linke like e.g. cpe.ext.hpe.com/token-authed-repo? No link at all?}
 
+HPE provides CPE packages for both, Redhat Enterprise Linux and SUSE Linux Enterprise, where newer versions of CPE are provided for both architectures, x86\_64 and aarch64.
+Once we have an account with HPE, generated an access token and settled on the operating system, we can set up the package manager to pull packages from HPE's package repository, by pointing it to the URL \lstinline{https://update1.linux.hpe.com/repo/cpe/<CPE-VER>/base/<OS>/<OS-VER>/<ARCH>}, where
+
+\begin{itemize}
+    \item \emph{\textless CPE-VER\textgreater} is the CPE version, e.g. 24.7, or 25.3
+    \item \emph{\textless OS\textgreater} is the operating system, i.e. \lst{rhel} or \lst{sle}
+    \item \emph{\textless OS-VER\textgreater} is the operating systems's version, e.g. \lst{15.5}
+    \item \emph{\textless ARCH\textgreater} \lst{x86_64} or \lst{aarch64}, optionally needed (CPE-24.7 requires the flag, CPE-25.3 has an architecture agnostic repository setup)
+\end{itemize}
+
+When building CPE in a container with GPU support, it is necessary to install also NVIDIA CUDA, which is provided as an RPM repository by NVIDIA.
+A \lst{Dockerfile} to build CPE in a container can be found at \lstinline{https://github.com/eth-cscs/cpe-containers}. The Dockerfile is parametrized to allow installing different versions of CPE,
+Every CPE release requires slightly varying packages to be installed, mostly the versions need to be adapted.
+We are building CPE container images for the GNU and Cray programming environment.
+Each programming environment will have its own container image.
+This allows to load default modules, when the container is instantiated, such that the programming environment is directly available without explicit \lst{module load PrgEnv-gnu}.
+The default list of modules loaded at startup is also parametrized in the Dockerfile, and the default is to load the most basic ones, which allows to compile applications for the target architecture. This is the module list for \lst{cpe-gnu} on the Grace Hopper nodes
+\begin{itemize}
+    \item craype-arm-grace
+    \item craype-network-ofi
+    \item craype
+    \item xpmem
+    \item PrgEnv-gnu
+    \item cray-mpich
+    \item cuda
+    \item craype-accell-nvidia90
+\end{itemize}
+Another advantage of building one container image per programming environment is the reduced image size of the image.
+Admittedly the sum of \lst{cpe-gnu} and \lst{cpe-cray} container images is larger than building both in the same container, because some packages, especially the cuda-toolkit, is installed in each container image.
+However a smaller size per programming environment will have long term advantages, where user's typically are only interested in one environment, and will build their container image on top of the programming environment of their interest.
+
+
+\todo{AF: I think I addressed all points, so please remove if you think so too}
 \todo{summarize the process for creating CPE containers}
 \begin{itemize}
     \item how to get access to the RPM repository and pull from it
@@ -25,8 +60,13 @@ In this section we will provide detailed instructions on how CSCS builds CPE con
 \label{sec:cpe-container-deploy}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Describe the CI/CD pipeline.
+In the repository \lstinline{https://github.com/eth-cscs/cpe-containers} we have a CI/CD pipeline to build, test and deploy the container images, for the different CPE versions and programming environments.
+The pipeline is building a fresh container image, when opening a PR, which is also tested on the target system.
+On a merge to the \lst{main} branch the container image is also deployed to the CSCS container registry.
+Once the image is deployed to the registry, it can be pulled on the target system, and made available for users.
 
+
+\todo{Move cpe-containers repo}
 Should we move the \lstinline{https://github.com/finkandreas/cpe-containers/} repo to the \lstinline{eth-cscs} organisation?
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -44,5 +84,6 @@ With the SLURM integration from Pyxis, starting a job with the CPE is simple, fo
 \begin{lstlisting}
 srun --environment=cpe-24.7 --pty bash
 \end{lstlisting}
-The container environment is transparent to users, because the Slurm plugin mounts the scratch filesystem so that software built on scratch will be persist between invocations.
+The container environment is transparent to users, because the Slurm plugin mounts the scratch filesystem so that software built on scratch will persist between invocations.
+The instantiation of the container is very much equivalent of a \lstinline{module load PrgEnv-gnu}. Additional modules like \lst{hdf5}, if needed, can be loaded by the user.
 
