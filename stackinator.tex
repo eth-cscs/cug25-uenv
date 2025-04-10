@@ -1,0 +1,19 @@
+The  \stackinator tool, that is used to generate squashfs images from a YAML-based recipe, was documented in detail at CUG 2023~\cite{uenv2023}.
+The implementation details of \stackinator were covered in that paper, and have not changed materially.
+The method used by \stackinator to install \craympich using Spack~\cite{gamblin:sc15} outside the CPE was demonstrated was shown in~\cite{uenv2023} 
+This approach is used by \stackinator, however it can also be used directly with Spack -- CSCS staff use it to install the most recent versions of \craympich on LUMI.
+
+\todo{add some more color about stackinator: changes since 2023; per-stack spack versioning; site repo; how all this minimises the Spack upgrade pain.}
+
+\todo{providing libfabric, cxi, cassini}
+
+\todo{OpenMPI}
+
+\todo{NVIDIA libraries}
+
+This section will focus on Spack packing for other key libraries that implement inter-node communication -- for example MPI, NCCL and \nvshmem -- need to be optimized for the Slingshot 11 network in HPE Cray-EX systems.
+
+We will focus on three main sets of libraries. The first is building OpenMPI with libfabric support, in order to provide an alternative to \craympich when there are bugs or performance regressions for specific applications, and to support software that is distributed as binaries linked against OpenMPI. The second is how to build the open source libfabric and CXI driver software for Slingshot 11. Finally, we will show how we adapt \cufftmp and \cusolvermp, which are distributed as pre-build binaries for infiniband, to use \nvshmem with libfabric support, which we developed in collaboration with NVIDIA.
+
+Note that while these methods are integrated into Stackinator, they can be used directly by Spack. All Spack packages, scripts and guides will be made available on GitHub for readers to use.
+
