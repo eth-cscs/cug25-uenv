@@ -1,0 +1,18 @@
+CSCS provides a command line tool for users to manage uenv images, and start sessions; and a SLURM plugin that for integrating uenv into jobs.
+The tools are written in C++, with a common library shared by both implementations, in an open source GitHub repository\footnote{\href{https://github.com/eth-cscs/uenv2}{\lst{github.com/eth-cscs/uenv2}}}.
+Static binary and .so file, with CI/CD that build RPMs ready to install on HPE systems.
+
+The uenv command line tool (uenv CLI) allows users to interact with and manage uenv images.
+Below is an example workflow where a user first discovers which images are available, downloads an image, then runs a shell with the image running.
+
+\lstinputlisting[language=bash]{code/uenv-examples.sh}
+
+The uenv provide interfaces called views, that set environment variables.
+The \emph{modules} view will load modules, the \emph{spack} view simplifies using Spack to build software on top of the packages provided in the uenv, and uenv authors can also provide custom views that make subsets of the software in the uenv available.
+
+The SLURM plugin integrates support for mounting uenv images and configuring the environment.
+A default uenv can be set using \lst{#SBATCH --uenv} that provides the uenv inside the sbatch script, and loads it by default for every srun call.
+The uenv can also be specified using the \lst{srun --uenv}, for example:
+\lstinputlisting[language=bash]{code/uenv-slurm.sh}
+
+\todo{The paper will describe the implementation in more detail, and demonstrate how the tools are used to support diverse workflows.}

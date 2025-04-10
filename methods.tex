@@ -1,4 +1,4 @@
-In this section, we present a comprehensive analysis of CSCS's software deployment methodology, following the complete lifecycle from initial software compilation through to end-user interaction.
+This section presents the components of CSCS's software deployment workflow, following the complete lifecycle from initial software compilation through to end-user interaction.
 We examine three key stages: the building of software components with their specific dependencies and optimizations, the deployment mechanisms across diverse computational environments, and the CLI and SLURM tools that provide these environments to users.
 %This structured approach allows us to thoroughly address the complexities inherent in managing scientific software on large-scale HPC systems.
 
@@ -12,7 +12,6 @@ The method used by \stackinator to install \craympich using Spack~\cite{gamblin:
 This approach is used by \stackinator, however it can also be used directly with Spack -- CSCS staff use it to install the most recent versions of \craympich on LUMI.
 
 \todo{add some more color about stackinator: changes since 2023; per-stack spack versioning; site repo; how all this minimises the Spack upgrade pain.}
-
 
 \todo{providing libfabric, cxi, cassini}
 
@@ -28,114 +27,12 @@ Note that while these methods are integrated into Stackinator, they can be used 
 
 %------------------------------------------------------------------------------
 \subsection{Deployment: CI/CD}
+\label{sec:cicd}
 %------------------------------------------------------------------------------
-
-Alps has five node node types described in \tbl{tab:alps-nodes}, on top of which CSCS creates vClusters\footnote{Versatile software defined cluster}~\cite{vClusters2023}, where each vCluster is a separate SLURM cluster that is customised for a tenant.
-As such, the version of SLURM, mounted file systems and software installed in the OS image (including libfabric) can vary between vClusters.
-
-\begin{table*}[!htb]
-    \begin{minipage}{0.6\textwidth}
-        \centering
-        \begin{tabular}{llrrrr}
-        \toprule
-        uarch   & type         & blades & nodes & CPU sockets & GPU devices \\
-        \midrule
-        gh200   & NVIDIA GH200 & 1,344   & 2,688  & 10,752      & 10,752      \\
-        zen2    & AMD Rome     & 256     & 1,024  & 2,048       & --          \\
-        a100    & NVIDIA A100  & 72      & 144    & 144         & 576         \\
-        mi300   & AMD MI300A   & 64      & 128    & 512         & 512         \\
-        mi200   & AMD MI250x   & 12      & 24     & 24          & 96          \\
-        \midrule
-        \multicolumn{2}{c}{\textsc{Total}}      & 1,748   & 3,880  & 13,480  & 11,936 \\
-        \bottomrule
-        \end{tabular}
-    \end{minipage}%
-    \begin{minipage}{0.4\textwidth}
-        \centering
-        \begin{tabular}{lll}
-        \toprule
-        tenant   & vCluster & uarch         \\
-        \midrule
-            ML      & Clariden & gh200 \\
-            ML      & Bristen  & a100 \\
-            HPC     & Daint    & gh200 \\
-            HPC     & Eiger    & zen2 \\
-            Climate & Santis   & gh200  \\
-            MetoSwiss & Balfrin   & a100 and zen2  \\
-        \bottomrule
-        \end{tabular}
-    \end{minipage}
-    \caption{Alps node types and their specifications (left), and examples of vClusters provided to tenants (right).}
-\label{tab:alps-nodes}
-\end{table*}
-
-Over the last two years uenv have proven to be portable between vClusters with the same microarchitecture, and we continue to further reduce the dependence on the underlying OS image, which will also help improve long-term stability of software stacks.
-However, to deploy a uenv to a vCluster we still require that it be built on a compute node of the target vCluster to avoid the need for cross compilation, and to ensure that dependencies like libfabric and Slurm are correctly handled.
-
-Manually building and deploying uenv images would be tedious and error prone.
-We use a CI/CD pipeline 
-\begin{itemize}
-    \item The uenv image recipes (YAML files) are maintained in a GitHub repository.
-    \item Comments on pull requests trigger a pipeline that builds and tests the uenv image: e.g \lst{system=daint;uarch=gh200;uenv=vasp:v6.5.0}
-    \item A GitLab runner that launches build and test stages on the target cluster.
-    \item A ReFrame test suite that selects the appropriate tests to run after building the uenv.
-\end{itemize}
-
-\todo{expand the points below. Provide an example of the oras commands used to push, pull and attach meta data}
-
-The build pipeline generates two artifacts: a squashfs image and image meta data, which are pushed to an on-premises container registry.
-The registry is provided by JFrog\footnote{\href{https://jfrog.com}{\lst{jfrog.com}}}, and Oras\footnote{\href{https://oras.land}{\lst{oras.land}}} is used to push and pull images, so any DockerHub API compatible registry would work.
-The images are stored in a \lst{build} namespace, with a tag that corresponds to the unique id of the CI/CD job that built the image, for example:
-\begin{lstlisting}
-jfrog.svc.cscs.ch/uenv/build/daint/gh200/vasp/v6.5.0:1631426005
-\end{lstlisting}
-
-The final deployment is manual, because we find that it is often necessary to first perform additional testing such as providing the image to selected users for validation.
-Deployment is performed using the CLI tool (see \sect{sec:cli}):
-\begin{lstlisting}
-uenv image copy build::vasp:1631426005 \
-                deploy::vasp/v6.5.0:v1@daint
-\end{lstlisting}
-Once deployed, the image is available for users to pull and run.
-
-Users can also use the same build pipeline to build their own uenv from a recipe from anywhere on the CSCS network:
-\begin{lstlisting}
-> uenv build myapp/v1.2@daint%gh200 <recipe-path>
-Log         : https://cicd-ext-mw.cscs.ch/ci/uenv/
-build?image=cu3upvpoag1s73eo3n80-3690753405420143
-Status      : submitted
-
-Destination
-Registry    : jfrog.svc.cscs.ch/uenv
-Namespace   : service
-Label       : myapp/v1.2:1626811672@daint%gh200
-\end{lstlisting}
-where \lst{recipe-path} is the YAML recipe.
-The link can be used to check the status of the image, and once the image has been built the user can pull it:
-\begin{lstlisting}
-uenv image pull service::myapp/v1.2:1626811672
-\end{lstlisting}
+\input{cicd.tex}
 
 %------------------------------------------------------------------------------
 \subsection{User Experience: CLI and SLURM}
 \label{sec:cli}
 %------------------------------------------------------------------------------
-
-CSCS provides a command line tool for users to manage uenv images, and start sessions; and a SLURM plugin that for integrating uenv into jobs.
-The tools are written in C++, with a common library shared by both implementations, in an open source GitHub repository\footnote{\href{https://github.com/eth-cscs/uenv2}{\lst{github.com/eth-cscs/uenv2}}}.
-Static binary and .so file, with CI/CD that build RPMs ready to install on HPE systems.
-
-The uenv command line tool (uenv CLI) allows users to interact with and manage uenv images.
-Below is an example workflow where a user first discovers which images are available, downloads an image, then runs a shell with the image running.
-
-\lstinputlisting[language=bash]{code/uenv-examples.sh}
-
-The uenv provide interfaces called views, that set environment variables.
-The \emph{modules} view will load modules, the \emph{spack} view simplifies using Spack to build software on top of the packages provided in the uenv, and uenv authors can also provide custom views that make subsets of the software in the uenv available.
-
-The SLURM plugin integrates support for mounting uenv images and configuring the environment.
-A default uenv can be set using \lst{#SBATCH --uenv} that provides the uenv inside the sbatch script, and loads it by default for every srun call.
-The uenv can also be specified using the \lst{srun --uenv}, for example:
-\lstinputlisting[language=bash]{code/uenv-slurm.sh}
-
-\todo{The paper will describe the implementation in more detail, and demonstrate how the tools are used to support diverse workflows.}
+\input{uenv.tex}

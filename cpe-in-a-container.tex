@@ -1,4 +1,33 @@
-Installing and updating CPE requires root permission to rebuilding node image and reboot nodes with the new image, and updating the installation of CPE can break user-installed software built on top of the CPE.
+The Cray Programming Environment (CPE) provides a rich software stack: compilers, communication libraries, commonly used scientific libraries (e.g. fftw, hdf5, netcdef) and tools.
+The CPE provided by HPE as a collection of RPMs, that at CSCS were installed via Ansible and deployed to the nodes using the data virtualization service (DVS)\cite{dvs}.
+
+Introduction structure:
+\begin{itemize}
+    \item it is a rich software stack that provides much of what users need
+    \item it does not provide everything that all users require - sites typically install additional software based on CPE.
+    \item Until recently CSCS has also provided softw
+    \item release schedule is now every 6 months
+    \item Downside: using CPE as a base layer breaks "no root", "no reboot", and "don't break user codes" tenents
+    \item for these reasons CSCS no longer uses CPE as the base layer for software installation - we use methods in previous sections
+    \item We still deployed an old version - hidden behind a cray module
+    \item when users log in the first thing they do is module avail, and naturally choose the cray module.
+    \item in this section we will describe how we use containers to deploy CPE for users who require it, in a way that does not violate our axioms.
+\end{itemize}
+
+%The benefits of deploying CPE in a container include:
+%\begin{itemize}
+%\item CPE containers can be built, tested and deployed by the support team without root access;
+%\item New releases, custom configurations and patched releases of CPE can be deployed without any changes to the underlying system or interruption to service;
+%\end{itemize}
+
+\subsection{creating CPE containers}
+
+\subsection{deploying CPE containers}
+
+
+Installing and updating CPE requires root permission to rebuilding node image and reboot nodes with the new image
+
+and updating the installation of CPE can break user-installed software built on top of the CPE.
 This is in opposition to the objective of giving support staff the ability to deploy software stacks without root or interruption to the system.
 
 CSCS continues to provide CPE via containers, built without root permission using Podman, deployed without modifying the cluster, and without removing previously deployed CPE containers.
@@ -8,11 +37,7 @@ This approach is possible due to two developments:
        \item HPE have improved the modularity of CPE packageing, and started releasing them through a new \href{https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html}{RPM repository} that can be used directly in Dockerfiles.
 \end{itemize}
 
-%The benefits of deploying CPE in a container include:
-%\begin{itemize}
-%\item CPE containers can be built, tested and deployed by the support team without root access;
-%\item New releases, custom configurations and patched releases of CPE can be deployed without any changes to the underlying system or interruption to service;
-%\end{itemize}
+\subsection{using CPE containers}
 
 With the SLURM integration from Pyxis, starting a job with the CPE is simple, for example starting an interactive shell on a compute node with a specific release of CPE:
 \begin{lstlisting}
