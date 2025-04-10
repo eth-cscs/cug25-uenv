@@ -1,48 +1,48 @@
-The Cray Programming Environment (CPE) provides a rich software stack: compilers, communication libraries, commonly used scientific libraries (e.g. fftw, hdf5, netcdef) and tools.
-The CPE provided by HPE as a collection of RPMs, that at CSCS were installed via Ansible and deployed to the nodes using the data virtualization service (DVS)\cite{dvs}.
+CSCS is phasing out using CPE as an underlying layer on top of which we build software for users, and we now recommend that users use either uenv or containers for building and running applications and workflows, for the reasons described in \sect{sec:cpe}.
 
-Introduction structure:
+CPE is still provided on our vClusters as containers.
+At CSCS we have been testing monolithic containers that contain the full CPE, provided by HPE, since 2021.
+These containers had the downside of being very large, and were pre-built which minimised the opportunities customization for CSCS' specific needs.
+
+More recently, in 2024, HPE have started to release RPMs for CPE components in a repository that HPE customers can access, and providing recipes for building bespoke CPE containers\footnote{\href{https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html}{\lst{cpe.ext.hpe.com}}}.
+In this section we will provide detailed instructions on how CSCS builds CPE containers, and links to repositories with the Containerfiles, followed by a discussion about how the containers are deployed and used on Alps.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Creating CPE containers}
+\label{sec:cpe-container-create}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\todo{summarize the process for creating CPE containers}
 \begin{itemize}
-    \item it is a rich software stack that provides much of what users need
-    \item it does not provide everything that all users require - sites typically install additional software based on CPE.
-    \item Until recently CSCS has also provided softw
-    \item release schedule is now every 6 months
-    \item Downside: using CPE as a base layer breaks "no root", "no reboot", and "don't break user codes" tenents
-    \item for these reasons CSCS no longer uses CPE as the base layer for software installation - we use methods in previous sections
-    \item We still deployed an old version - hidden behind a cray module
-    \item when users log in the first thing they do is module avail, and naturally choose the cray module.
-    \item in this section we will describe how we use containers to deploy CPE for users who require it, in a way that does not violate our axioms.
+    \item how to get access to the RPM repository and pull from it
+    \item how we set up the dockerfile/containerfile
+    \item how we configured which modules to load automatically to set up the "environment"
+    \item how we chose to split into separate GNU and Cray images instead of a "one size fits all image"
 \end{itemize}
 
-%The benefits of deploying CPE in a container include:
-%\begin{itemize}
-%\item CPE containers can be built, tested and deployed by the support team without root access;
-%\item New releases, custom configurations and patched releases of CPE can be deployed without any changes to the underlying system or interruption to service;
-%\end{itemize}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Deploying CPE containers}
+\label{sec:cpe-container-deploy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{creating CPE containers}
+Describe the CI/CD pipeline.
 
-\subsection{deploying CPE containers}
+Should we move the \lstinline{https://github.com/finkandreas/cpe-containers/} repo to the \lstinline{eth-cscs} organisation?
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{using CPE containers}
+\label{sec:cpe-container-use}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Installing and updating CPE requires root permission to rebuilding node image and reboot nodes with the new image
+\todo{describe how the containers are used.}
 
-and updating the installation of CPE can break user-installed software built on top of the CPE.
-This is in opposition to the objective of giving support staff the ability to deploy software stacks without root or interruption to the system.
-
-CSCS continues to provide CPE via containers, built without root permission using Podman, deployed without modifying the cluster, and without removing previously deployed CPE containers.
-This approach is possible due to two developments:
 \begin{itemize}
        \item Alps uses forks of the \href{https://github.com/NVIDIA/enroot}{enroot} container runtime and \href{https://github.com/NVIDIA/pyxis}{Pyxis} Slurm plugin to provide an integrated container solution.
        \item HPE have improved the modularity of CPE packageing, and started releasing them through a new \href{https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html}{RPM repository} that can be used directly in Dockerfiles.
 \end{itemize}
-
-\subsection{using CPE containers}
-
 With the SLURM integration from Pyxis, starting a job with the CPE is simple, for example starting an interactive shell on a compute node with a specific release of CPE:
 \begin{lstlisting}
 srun --environment=cpe-24.7 --pty bash
 \end{lstlisting}
 The container environment is transparent to users, because the Slurm plugin mounts the scratch filesystem so that software built on scratch will be persist between invocations.
 
-The paper will describe the workflow for building containers, and a link to a GitHub repository with DockerFiles use at CSCS, along with ReFrame tests for their deployment.

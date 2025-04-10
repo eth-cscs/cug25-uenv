@@ -1,0 +1,26 @@
+\todo{Describe "traditional" CPE deployment and why this is not compatible with the software deployment Objectives.}
+
+The Cray Programming Environment (CPE) provides a rich software stack: compilers, communication libraries, commonly used scientific libraries (e.g. fftw, hdf5, netcdef) and tools.
+The CPE provided by HPE as a collection of RPMs, that CSCS installed via Ansible and deployed to the nodes using the data virtualization service (DVS)\cite{dvs}.
+
+
+\begin{itemize}
+    \item it does not provide everything that all users require - sites typically install additional software based on CPE.
+    \item Until recently CSCS has also provided software on top.
+    \item release schedule is now every 6 months
+    \item Downside: using CPE as a base layer breaks "no root", "no reboot", and "don't break user codes" tenents
+    \item for these reasons CSCS no longer uses CPE as the base layer for software installation - we use methods in previous sections
+    \item We still deployed an old version - hidden behind a cray module
+    \item when users log in the first thing they do is module avail, and naturally choose the cray module.
+    \item in this section we will describe how we use containers to deploy CPE for users who require it, in a way that does not violate our axioms.
+\end{itemize}
+
+Installing and updating CPE requires root permission to rebuilding node image and reboot nodes with the new image
+
+and updating the installation of CPE can break user-installed software built on top of the CPE.
+This is in opposition to the objective of giving support staff the ability to deploy software stacks without root or interruption to the system.
+
+
+As of the time of writing, CPE is still available through a \lstinline{cray} module on Daint, though it is not "supported" on the system.
+
+In \sect{sec:cpe-container} we describe how CSCS will continue providing CPE in a container.
