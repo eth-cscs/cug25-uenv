@@ -1,4 +1,4 @@
-TEXFILES=paper.tex abstract.tex introduction.tex objectives.tex methods.tex usecases.tex discussion.tex cpe-in-a-container.tex cicd.tex uenv.tex stackinator.tex
+TEXFILES=paper.tex abstract.tex introduction.tex objectives.tex methods.tex usecases.tex discussion.tex cpe-in-a-container.tex cicd.tex uenv.tex stackinator.tex cpe.tex
 
 all: paper.pdf
 
