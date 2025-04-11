@@ -1,0 +1,24 @@
+\begin{tikzpicture}[
+    node distance=5cm and 3cm,
+    %every node/.style={font=\sffamily},
+    box/.style={draw, thick, minimum width=3.5cm, minimum height=2.5cm, align=center},
+    arrow/.style={-{Latex[length=3mm]}, thick}
+  ]
+
+  \node[database,label=below:registry,database radius=1cm,database segment height=0.5cm] (rego) {};
+  \node[database,label=below:repository,database radius=1cm,database segment height=0.5cm] at (6,-1) (repo) {};
+  \node[alice,mirrored,label=below:user, minimum size=1.5cm] at (12,0) (user) {};
+
+  \draw[arrow] (1.2,-0.5)  -- node[above] {image pull} (4.8,-0.5);
+  \draw[arrow] (1.2,0.6)   -- node[above] {image find} (11.0,0.6);
+  \draw[arrow] (7.5,-0.5)  -- node[above] {image ls} (11.0,-0.5);
+  \draw[arrow] (7.5,-1.2)  -- node[above] {image inspect} (11.0,-1.2);
+  \draw[arrow] (-1,-1) to[out=120, in=180,looseness=2] (-2,-2)  to[out=0,in=-100,looseness=2] (rego.south west);
+  \draw[arrow] (5,-2) to[out=120, in=180,looseness=2] (4,-3) to[out=0,in=-100,looseness=2] (repo.south west);
+
+  \node at (-2,-2.35) {image copy};
+  \node at (-2,-2.75) {image delete};
+
+  \node at (4,-3.35) {image add};
+  \node at (4,-3.75) {image rm};
+\end{tikzpicture}

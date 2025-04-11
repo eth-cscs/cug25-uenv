@@ -13,6 +13,7 @@
 \usepackage{pgfplotstable}
 \usepackage{textcomp}
 \usepackage{tikz}
+\usepackage{tikzpeople}
 \usepackage{url}
 \usepackage{xcolor}
 \usepackage{xspace}
@@ -22,6 +23,7 @@
 \usetikzlibrary{pgfplots.groupplots}
 
 \newcommand{\crayex}{HPE Cray EX\xspace} % standardize name for Cray EX platform
+\newcommand{\squashfs}{SquashFS\xspace} % standardize name for squashfs
 \newcommand{\craympich}{Cray-MPICH\xspace} % standardize name for cray mpich
 \newcommand{\stackinator}{Stackinator\xspace} % standardize name the stackinator tool
 \newcommand{\spack}{Spack\xspace} % standardize name for spack
@@ -90,11 +92,26 @@
         mikael.simberg@cscs.ch}
 }
 
-%\affiliation{%
-%  \institution{ETH Zurich, Swiss National Supercomputing Centre (CSCS)}
-%  \city{Lugano}
-%  \country{Switzerland}
-%}
+\makeatletter
+\tikzset{
+    database/.style={
+        path picture={
+            \draw (0, 1.5*\database@segmentheight) circle [x radius=\database@radius,y radius=\database@aspectratio*\database@radius];
+            \draw (-\database@radius, 0.5*\database@segmentheight) arc [start angle=180,end angle=360,x radius=\database@radius, y radius=\database@aspectratio*\database@radius];
+            \draw (-\database@radius,-0.5*\database@segmentheight) arc [start angle=180,end angle=360,x radius=\database@radius, y radius=\database@aspectratio*\database@radius];
+            \draw (-\database@radius,1.5*\database@segmentheight) -- ++(0,-3*\database@segmentheight) arc [start angle=180,end angle=360,x radius=\database@radius, y radius=\database@aspectratio*\database@radius] -- ++(0,3*\database@segmentheight);
+        },
+        minimum width=2*\database@radius + \pgflinewidth,
+        minimum height=3*\database@segmentheight + 2*\database@aspectratio*\database@radius + \pgflinewidth,
+    },
+    database segment height/.store in=\database@segmentheight,
+    database radius/.store in=\database@radius,
+    database aspect ratio/.store in=\database@aspectratio,
+    database segment height=0.1cm,
+    database radius=0.25cm,
+    database aspect ratio=0.35,
+}
+\makeatother
 
 \maketitle
 
