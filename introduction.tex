@@ -3,10 +3,16 @@ Instead of deploying a single large SLURM cluster, the system is partitioned int
 The combination of tenants and use cases requires distributing responsibility for providing and supporting software environments to many individuals and teams inside CSCS.
 
 Ideally software support staff would have end to end responsibility: the ability to install all software as users without interrupting the operation of the system, using automated CI/CD pipelines.
-Furthermore, to continue scaling support to more use cases and systems, the tooling and methods used need to: reduce dependence of software stacks on the base OS image installed on each tenant; decouple software environments; automate deployment; and support users who need to provide their own software stacks.
+Furthermore, to continue scaling support to more use cases and systems, the tooling and methods used need to:
+\begin{itemize}
+    \item reduce the dependence of software stacks on the base OS image installed on each tenant
+    \item decouple (and simplify) software environments
+    \item automate deployment
+    \item support users who need to provide their own software stacks.
+\end{itemize}
 
 CSCS has found that there is no silver bullet that meets all of these requirements.
-For example, HPC containers allow users bring software stacks built elsewhere, offer excellent isolation between environments, and container runtimes can inject optimized communication libraries which makes containerised software resilient to changes to the underlying system.
+For example, HPC containers allow users to bring software stacks built elsewhere, they offer excellent isolation between environments, and container runtimes can inject optimized communication libraries making containerised software resilient to changes to the underlying system.
 But supporting containers alone is not sufficient -- we also need to provide software optimised for the target platform, and support users building their own optimized containers.
 
 At CUG 2023 CSCS presented \stackinator~\cite{uenv2023}, a tool for building isolated and reproducible software environments as Squashfs images called uenv, optimized for Cray EX hardware.
@@ -17,6 +23,11 @@ Then the tools and processes used to achieve our objectives will be introduced i
 How CSCS continues to provide CPE as a container, with recipes and lessons learnt for building CPE in a container will be covered in \sect{sec:cpe}.
 Finally we will describe some interesting use cases for uenv in \sect{sec:usecases}, and discuss the maintenance overheads and issues with our approach in~\sect{sec:discussion}.
 
-The topics of interest to the CUG audience covered in this paper include: providing libraries like OpenMPI and NVIDIA software stack optimized for Slingshot; reproducible HPC software environments; using containers to deploy CPE; and modernising the deployment of software on HPC systems.
+The topics of interest to the CUG audience covered in this paper include:
+\begin{itemize}
+    \item Providing libraries like OpenMPI and NVIDIA software stack optimized for Slingshot
+    \item Reproducible HPC software environments
+    \item Using containers to deploy CPE
+    \item Modernising the deployment of software on HPC systems
+\end{itemize}
 Some of the implementation is CSCS-specific, however all of the software and pipelines are in permissibly licensed open source repositories that can be used as is, or used for tips and guidance in developing other sites' solutions.
-
