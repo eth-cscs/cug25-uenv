@@ -1,4 +1,4 @@
-Alps has five node node types described in \tbl{tab:alps-nodes}, on top of which CSCS creates vClusters\footnote{Versatile software defined cluster}~\cite{vClusters2023}, where each vCluster is a separate SLURM cluster that is customised for a tenant.
+Alps has five node node types described in \tbl{tab:alps-nodes}, on top of which CSCS partitions the system into vClusters\footnote{Versatile software defined cluster}~\cite{vClusters2023}, where each vCluster is a separate SLURM cluster that is customised for a tenant.
 As such, the version of SLURM, mounted file systems and software installed in the OS image (including libfabric) can vary between vClusters.
 
 \begin{table*}[!htb]
@@ -36,6 +36,21 @@ As such, the version of SLURM, mounted file systems and software installed in th
     \caption{Alps node types and their specifications (left), and examples of vClusters provided to tenants (right).}
 \label{tab:alps-nodes}
 \end{table*}
+
+Uenv have minimal dependencies on the system, specifically:
+\begin{itemize}
+    \item libfabric: 
+    \item xpmem: a direct requirement of libfabric, and is sometimes used when building low level communication libraries.
+        Not used directly by uenv that use cray-mpich or NCCL without a custom libfabric implementation.
+    \item SLURM: in theory packages can depend on SLURM, but in practice it has not been picked up in any uenv.
+\end{itemize}
+
+Not all uenv are provided for every micro-architecture on every cluster.
+Instead, uenv are ``deployed'' to specific cluster+micro-architecture combinations where they are required by the tenent and can be supported by the appropriate team at CSCS or a partner organisation.
+For example, the ICON uenv (for building and running the ICON atmospheric model) is deployed on only two systems where it is supported: the gh200 nodes on Santis (the climate and weather platform system) and the a100 nodes on Balfrin (the Swiss weather service test and development cluster).
+
+Uenv are also versioned, and can have incremental updates (called tags).
+The information about versions, micro-architectures and the target system is captured in a ``label'' of the form \lst{name/version:tag@system\%uarch}
 
 Over the last two years uenv have proven to be portable between vClusters with the same microarchitecture, and we continue to further reduce the dependence on the underlying OS image, which will also help improve long-term stability of software stacks.
 However, to deploy a uenv to a vCluster we still require that it be built on a compute node of the target vCluster to avoid the need for cross compilation, and to ensure that dependencies like libfabric and Slurm are correctly handled.
