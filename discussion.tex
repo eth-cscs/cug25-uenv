@@ -1,1 +1,79 @@
-A discussion about the staffing overheads required to support the tooling and workflows, user feedback on the user experience, and future plans.
+\subsection{The Objectives}
+Here we review the original objectives.
+
+\subsubsection{Provide optimised software}
+
+Deployment of key software like MPI, compilers and NVIDIA tools via uenv is on par with or better than CPE.
+
+Our efforts to deploy libfabric, OpenMPI and NVIDIA libraries that are tuned for the system are ongoing, with that provide them available for early testing on the system.
+Robust deployment of these components will require the release of Spack 1.0 and improved versioning and release management of the open sourced CXI, Cassini headers and libfabric from HPE.
+
+\subsubsection{Gitops deployment}
+
+The uenv recipes are managed in a GitHub repository, and the tools used by the deployment pipeline are managed in separate GitHub repositories.
+
+The pipeline deploys uenv as discreted artifacts to a container registry that is accessible from the different clusters on Alps.
+
+Finally, each uenv contains the original recipe and other meta data required to rebuild the image at a later date.
+Currently the process of rebuilding from a uenv image is quite manual, and is something that will be the focus of future work.
+
+\subsubsection{Decouple environments}
+
+New versions of uenv images can be deployed, without removing or modifying existing environments, so workflows are not affected and can upgrade at their own pace.
+
+This paper did not cover changes to the base OS that is installed on a cluster are managed -- they are tracked in a separate configuration repository.
+To date we have only had one breaking change on the system, whereby the libfabric installed as part of the Slingshot host software changed location after an upgrade.
+We were able to work around this issue without rebuilding uenv images, however we have the ability to rebuild images in such situations, and our ongoing efforts to install Slinghshot from source inside uenv will further migigate these risks.
+
+Finally, uenv that provide the latest version of cray-mpich are deployed days after it is released, along with uenv that use the pre-release of cray-mpich 9.0 for testing.
+
+\subsection{End to end responsibility for software support teams}
+
+This has been one of the main outcomes of this work -- teams across CSCS are deploying full software stacks with very little central coordination, and with no interaction with system administrators.
+See~\sect{discuss-wc} for an example of how users have started deploying their own software stacks.
+
+\subsection{Maintenance overheads}
+\label{sec:discuss-staff}
+
+Maintaining the Stackinator tool, the CI pipeline,  and uenv tools is not free -- a core team of two staff performs this work.
+One works 75\% on the effort, and the other about 25\%.
+CSCS staff actively contribute fixes of their own volition, and contribute to discussions about the architecture and design of the system.
+Now that the system is mature, the effort required to maintain it is less than the effort required to develop it.
+Overall, the amount of effort required to set up the deployment pipeline and tooling was greater than what was required for the system that it replaced, however this system is more powerful and flexible.
+
+One side effect of this effort is that by decoupling deployment of software environments, a lot more software is being deployed than on the old Piz Daint Cray XC system.
+The total amount of effort spent on building and testing software is roughly the same, however more complicated software stacks are being deployed to half a dozen clusters and for a wider range of domains than before.
+This leads us to a key observation from CSCS efforts to support multi-tenancy through increased automation and flexibility: the effort required to perform a task like deploying a cluster, building a software stack or adding a dashboard goes down, but the total amount of work stays the same because the number of clusters, software stacks and dashboards will expand to fill capacity.
+
+\subsection{Empowering staff empowers users}
+\label{sec:discuss-wc}
+
+One of the objectives was to give staff end-to-end responsibility for software deployed on the system (see~\ref{sec:objective-e2e}).
+This was achieved through enabling users to build fully self-contained uenv that include software that was previously installed by system administrators (e.g. \lst{cray-mpich}).
+The CI/CD pipeline makes maintaining the recipe, and deploying to different clusters relatively straightforward.
+
+The climate and weather community have started to maintain their own software stacks, by creating recipe repositories and pipelines using the same CI/CD infrastructure.
+The registry contains uenv for the production MeteoSwiss environment, and for the software environments used on the climate and weather platform.
+
+The significance of this can't be overstated -- in the past CSCS maintained these challenging software stacks, and the community was often frustrated with forced upgrades or having to iterate with CSCS to define their environment.
+It was one of the key aims of the move to multi-tenancy and use-case specific clusters that tenants and communities would take more responsibility for software -- however how this would manifest was not clear.
+The current solution was not part of a master-plan, instead it is a happy consequence of the user-first design to empower staff who don't have root.
+
+\subsection{Deploying outside CSCS}
+\label{sec:discuss-site}
+
+Much of what has been presented here is site-specific: the on-site container registry and ci/cd infrastructure would be different.
+The processes and lessons are transferable, however what we have presented is not a turnkey solution.
+
+The main software tools for building and using uenv are quite easy to get running locally.
+Stackinator can be used to build squashfs images, or even to install isolated solftware stacks in a directory on a shared file system.
+The uenv CLI tool and SLURM plugin have some site-specific customization related to:
+\begin{itemize}
+    \item the container registry address and some quirks of dealing with its API;
+    \item determining the name of the cluster on which the tool is being used;
+    \item determining the username;
+    \item and configuring credentials for interacting with the registry.
+\end{itemize}
+These are implemented in a separate C++ header and implementation file, which can be customised.
+Note that these features are only required for interacting with a remote registry: the tools will still function with a local repository.
+If there is interest from other sites, this could be refactored to make registry interaction more plug and play.

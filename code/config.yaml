@@ -1,0 +1,41 @@
+clusters:
+  daint:
+    targets:
+      -
+        uarch: 'gh200'
+        partition: 'normal'
+        variables:
+          F7T_URL: "https://api.cscs.ch/hpc/firecrest/v1"
+    runner: f7t
+  eiger:
+    targets:
+      -
+        uarch: 'zen2'
+        partition: 'normal'
+        variables:
+          SLURM_CONSTRAINT: 'mc'
+          F7T_URL: "https://api.cscs.ch/hpc/firecrest/v1"
+uenv:
+  prgenv-gnu:
+    "24.7":
+      recipes:
+        zen2: 24.7/mc
+        zen3: 24.7/mc
+        gh200: 24.7/gh200
+    "24.11":
+      recipes:
+        zen2: 24.11/mc
+        zen3: 24.11/mc
+        gh200: 24.11/gh200
+        a100: 24.11/a100
+  linaro-forge:
+    "24.1.2":
+      recipes:
+        zen2: "24.1.2"
+        gh200: "24.1.2"
+      mount: "/user-tools"
+    "24.1.1":
+      recipes:
+        zen2: "24.1.1"
+        gh200: "24.1.1"
+      mount: "/user-tools"

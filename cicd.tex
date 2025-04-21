@@ -1,4 +1,4 @@
-Alps has five node node types described in \tbl{tab:alps-nodes}, on top of which CSCS partitions the system into vClusters\footnote{Versatile software defined cluster}~\cite{vClusters2023}, where each vCluster is a separate SLURM cluster that is customised for a tenant.
+Alps has five node node types described in \tbl{tab:alps-nodes}, on top of which CSCS partitions the system into vClusters\footnote{Versatile software defined cluster}~\cite{vClusters2023}, where each is customised for a tenant.
 As such, the version of SLURM, mounted file systems and software installed in the OS image (including libfabric) can vary between vClusters.
 
 \begin{table*}[!htb]
@@ -37,53 +37,127 @@ As such, the version of SLURM, mounted file systems and software installed in th
 \label{tab:alps-nodes}
 \end{table*}
 
-Uenv have minimal dependencies on the system, specifically:
+The deployment of uenv in this environment means managing the versions of uenv available to users on vClusters of Alps.
+We use a CI/CD pipeline that builds, tests and stores uenv images in a self-hosted container registry.
+The design of the deployment pipeline and tools had to accommodate the following requirements:
+
+\textbf{Not all uenv are provided for every micro-architecture on every cluster.}
+Instead, uenv are ``deployed'' to specific cluster+micro-architecture combinations where they are required by the tenant and can be supported by the appropriate team at CSCS or a partner organisation.
+For example, the ICON uenv -- for building and running the ICON atmospheric model -- is deployed on only two systems where it is supported: the \emph{gh200} nodes on Santis (the climate and weather platform system) and the \emph{a100} nodes on Balfrin (the Swiss weather service test and development cluster).
+
+\textbf{Uenv images deployed to a vCluster are built on the target vCluster.}
+In their first two years in production, uenv have proven to be portable between vClusters with the same microarchitecture, and we continue to further reduce the dependence on the underlying OS image.
+However, to deploy a uenv to a vCluster we still require that it be built on a compute node of the target vCluster to avoid the need for cross compilation, and to ensure that dependencies like libfabric and SLURM are correctly handled.
+
+\textbf{Uenv are versioned, each version can be have multiple minor updates, and all versions/update combinations are available.}
+Each uenv has a name and version, for example, the \lst{prgenv-gnu} uenv is versioned using the \lst{YY.MM} format: \lst{prgenv-gnu/24.11} was released in November 2024.
+Minor updates and fixes can be applied, and are tracked using \lst{tags}.
+Using the \lst{prgenv-gnu} example, the initial release had the tag \lst{v1}, and the \lst{v2} release provided exactly the same software, with the addition of the \lst{netcdf} packages.
+
+Our aim is to provide these uenv to users in a way that lets them upgrade and roll back when it is appropriate for them.
+This requires deploying unique uenv artifacts for each combination of system, micro-architecture, name, version and tag.
+This information is captured in the full description of a uenv -- the uenv \emph{label} -- of the form \lst{name/version:tag@system\%uarch}.
+
+The remaionder of this section will first describe the three infrastructure components -- the GitHub repository for uenv recipes, the CI/CD service, and the container registry -- followed by a more detailed description of the pipeline.
+
+\miniheader{Infrastructure: GitHub recipe repository}
+
+The uenv recipes and information required to configure the pipeline to build and test them are managed in a GitHub repository\footnote{\href{https://github.com/eth-cscs/alps-uenv}{\lst{github.com/eth-cscs/alps-uenv}}}.
+\begin{figure}[htp!]
+    \input{code/gh-recipe-path.tex}
+    \caption{The directory layout of uenv recipes in the GitHub repository. The \lst{prgenv-gnu} recipes are specialized on target node type, while the \lst{linaro-forge} has a single recipe for each version.}
+    \label{fig:gh-recipe-path}
+\end{figure}
+\begin{figure}[htp!]
+    %\input{code/config.yaml}
+    \lstinputlisting[language=yaml]{code/config.yaml}
+    \caption{Part of the configuration in the GitHub uenv recipe repository.
+    The \lst{clusters} field describes the target clusters, including which microarchitectures are available on each cluster, and how to access them
+    The \lst{uenv} field describes the uenv in the repository, specifically the uenv, their versions, and which microarchitectures they can be deployed to.
+    }
+    \label{fig:gh-config}
+\end{figure}
+Recipes for the uenv are managed in sub-directories as illustrated in~\fig{fig:gh-recipe-path}.
+Note how the \lst{prgenv-gnu} uenv provides two versions (\lst{24.7} and \lst{24.11}), with microarchitecture specific recipes, while the \lst{linaro-forge} uenv has a single recipe for each version because the same recipe can be used to deploy on any microarchitecture.
+
+Information required to build and test uenv recipes on target system/uarch combinations is stored in a YAML file in the root, as illustrated in~\fig{fig:gh-config}.
+Each system is described, with an entry for each microarchitecture provided by the system that describes which SLURM partition to use, and additional environment variables used by SLURM and FirecREST~\cite{f7t2019}.
+For each uenv version, the recipe to use for each microarchitecture is provided -- note how the same recipe can be used to target multiple architectures.
+
+%--------------------------------------------------
+\miniheader{Infrastructure: CI/CD middleware}
+%--------------------------------------------------
+
+CSCS developed a CI/CD service for software projects hosted on GitHub, GitLab and BitBucket.
+The service provides a simple interface for CSCS users to register a new project at CSCS, configure a build pipeline using a YAML file in the repository, build and test on all Alps vClusters, and display the results.
+The aim was to provide access to HPC hardware and schedulers to test scientific applications on HPC systems, while integrating with GitHub similarly to existing services like Travis and Circle CI.
+
+The CI/CD service is used to implement the pipeline for building and deploying uenv images.
+A new CI/CD project was created, and configured so that:
 \begin{itemize}
-    \item libfabric: 
-    \item xpmem: a direct requirement of libfabric, and is sometimes used when building low level communication libraries.
-        Not used directly by uenv that use cray-mpich or NCCL without a custom libfabric implementation.
-    \item SLURM: in theory packages can depend on SLURM, but in practice it has not been picked up in any uenv.
+    \item staff responsible for uenv are white-listed to start build and test pipelines;
+    \item the project was granted access to all systems where CSCS deploys uenv.
 \end{itemize}
 
-Not all uenv are provided for every micro-architecture on every cluster.
-Instead, uenv are ``deployed'' to specific cluster+micro-architecture combinations where they are required by the tenent and can be supported by the appropriate team at CSCS or a partner organisation.
-For example, the ICON uenv (for building and running the ICON atmospheric model) is deployed on only two systems where it is supported: the gh200 nodes on Santis (the climate and weather platform system) and the a100 nodes on Balfrin (the Swiss weather service test and development cluster).
+%--------------------------------------------------
+\miniheader{Infrastructure: container registry}
+%--------------------------------------------------
 
-Uenv are also versioned, and can have incremental updates (called tags).
-The information about versions, micro-architectures and the target system is captured in a ``label'' of the form \lst{name/version:tag@system\%uarch}
-
-Over the last two years uenv have proven to be portable between vClusters with the same microarchitecture, and we continue to further reduce the dependence on the underlying OS image, which will also help improve long-term stability of software stacks.
-However, to deploy a uenv to a vCluster we still require that it be built on a compute node of the target vCluster to avoid the need for cross compilation, and to ensure that dependencies like libfabric and Slurm are correctly handled.
-
-Manually building and deploying uenv images would be tedious and error prone.
-We use a CI/CD pipeline 
+Artifacts generated by the pipeline need to be stored so that they can be queried and accessed by users.
+To these ends, we use a container registry provided by a self-hosted JFrog\footnote{\href{https://jfrog.com}{\lst{jfrog.com}}} that is visible on the CSCS network.
+There are two artifacts generated by every pipeline that are managed in the registry:
 \begin{itemize}
-    \item The uenv image recipes (YAML files) are maintained in a GitHub repository.
-    \item Comments on pull requests trigger a pipeline that builds and tests the uenv image: e.g \lst{system=daint;uarch=gh200;uenv=vasp:v6.5.0}
-    \item A GitLab runner that launches build and test stages on the target cluster.
-    \item A ReFrame test suite that selects the appropriate tests to run after building the uenv.
+    \item \textbf{uenv \squashfs images}: in the range of 300 MB -- 10 GB in size.
+    \item \textbf{meta data}: a single tar ball with information that includes ReFrame tests, the input recipe, and build information. Less than 10 KB in size.
 \end{itemize}
 
-\todo{expand the points below. Provide an example of the oras commands used to push, pull and attach meta data}
+Oras\footnote{\href{https://oras.land}{\lst{oras.land}}} is a command line tool for managing file types in OCI-compliant container registries.
+The pipeline and command line tool (see~\sect{sec:cli}) use Oras to query, push and pull uenv and meta data with the registry, see~\fig{fig:ci-oras}.
 
-The build pipeline generates two artifacts: a squashfs image and image meta data, which are pushed to an on-premises container registry.
-The registry is provided by JFrog\footnote{\href{https://jfrog.com}{\lst{jfrog.com}}}, and Oras\footnote{\href{https://oras.land}{\lst{oras.land}}} is used to push and pull images, so any DockerHub API compatible registry would work.
-The images are stored in a \lst{build} namespace, with a tag that corresponds to the unique id of the CI/CD job that built the image, for example:
+%--------------------------------------------------
+\miniheader{The deployment pipeline}
+%--------------------------------------------------
+
+The pipeline is triggered when a whitelisted user makes a formatted comment on a pull request, for example:
 \begin{lstlisting}
-jfrog.svc.cscs.ch/uenv/build/daint/gh200/vasp/v6.5.0:1631426005
+cscs-ci run alps;system=daint;uarch=gh200;uenv=cp2k:2025.1
 \end{lstlisting}
+The \lst{cscs-ci run alps;} command triggers the pipeline, and the remaining part of the argument is a list of variables that describe which image to build and where, that is forwarded to the first stage of the pipeline.
 
-The final deployment is manual, because we find that it is often necessary to first perform additional testing such as providing the image to selected users for validation.
-Deployment is performed using the CLI tool (see \sect{sec:cli}):
+The trigger specifies which uenv to build, because automatically detecting what to build is impractical, and we need to only build specific images that are affected by the pull request.
+In the first stage, the variables and information in the configuration file in~\fig{fig:gh-config} are used to dynamically generate the specific pipeline that will build and test the uenv on the target system.
+
+\begin{figure}[htp!]
+    \lstinputlisting[language=bash]{code/ci-oras.sh}
+    \caption{Examples of the Oras commands at the end of the build stage that push a \squashfs image and attach the meta data path to the image.
+    The image is pushed to the \lst{build} namespace, and is tagged with the CI job id \lst{1716820670}.}
+    \label{fig:ci-oras}
+\end{figure}
+
+The scripts that perform the build and test stages are in a separate repository\footnote{\href{https://github.com/eth-cscs/uenv-pipeline}{\lst{github.com/eth-cscs/uenv-pipeline}}}, that is used by the uenv build service (see below), and the by user-communities to create their own pipelines (see~\sect{sec:discuss-wc})
+
+If the build stage succeeds, the \squashfs image  and the meta data are pushed to the local registry \lst{jfrog.svc.cscs.ch/uenv}.
+The images are pushed to a \lst{build} namespace, namely \lst{jfrog.svc.cscs.ch/uenv/build/$label} where \lst{label} has the format \lst{system/uarch/name/version:tag} and the \lst{tag} is is the unique id of the CI/CD job that built it.
+Examples of the Oras commands used to perform this are illustrated in~\fig{fig:ci-oras}.
+Similar commands are used to download meta data and \squashfs images in the test stage, and also by the uenv CLI tool in~\sect{sec:cli}.
+
+When an image is ready for deployment, it is copied from the \lst{build} namespace to the \lst{deploy} namespace using the uenv CLI tool:
 \begin{lstlisting}
 uenv image copy build::vasp:1631426005 \
                 deploy::vasp/v6.5.0:v1@daint
 \end{lstlisting}
-Once deployed, the image is available for users to pull and run.
+Note that the deployment step is manual because CSCS staff often want to perform additional tests, or give the image to key users to test, before making the final decision to deploy.
 
-Users can also use the same build pipeline to build their own uenv from a recipe from anywhere on the CSCS network:
+%--------------------------------------------------
+\miniheader{The uenv build service}
+%--------------------------------------------------
+
+Some advanced users started building uenv images for themselves or their research groups, and CSCS staff were also providing one-off uenv images in response to individual user requests.
+We wanted to make it easy to build and provide ``unsupported'' uenv for these use cases.
+
+A build command was added to the uenv CLI, that will build an image using the pipeline from a user-provided recipe from anywhere on the CSCS network:
 \begin{lstlisting}
-> uenv build myapp/v1.2@daint%gh200 <recipe-path>
+> uenv build myapp/v1.2@daint%gh200 ./myapp-recipe
 Log         : https://cicd-ext-mw.cscs.ch/ci/uenv/
 build?image=cu3upvpoag1s73eo3n80-3690753405420143
 Status      : submitted
@@ -93,10 +167,54 @@ Registry    : jfrog.svc.cscs.ch/uenv
 Namespace   : service
 Label       : myapp/v1.2:1626811672@daint%gh200
 \end{lstlisting}
-where \lst{recipe-path} is the YAML recipe.
-The link can be used to check the status of the image, and once the image has been built the user can pull it:
-\begin{lstlisting}
-uenv image pull service::myapp/v1.2:1626811672
-\end{lstlisting}
+where \lst{./myapp-recipe} is a path containing the recipe.
 
+The ``Log'' URL links to a web site with live output of the build process.
+Once the image has been built, the image can be pulled from the container registry:
+\begin{lstlisting}
+uenv image pull service::myapp/v1.2:1626811672@daint
+\end{lstlisting}
+Note that the images are pushed to the \lst{service} namespace, which is separate from the \lst{build} and \lst{deploy} namespaces used by the main deployment pipeline.
+Images in the service namespace are available to all users (for ease of sharing), and are subject to more aggressive cleanup policies.
+
+
+%\begin{itemize}
+%    \item \emph{libfabric}: used by MPI and the AWS-OFI NCCL plugin.
+%        Versions 1.15.2 and 1.22.0, provided by HPE, are installed on most systems at the time of writing.
+%        CSCS are exploring methods for bundling libfabric inside uenv (see~\sect{sec:stackinator}), and deploying them so that they can be flexibly used by both uenv and containers.
+%    \item \emph{xpmem}: a direct requirement of libfabric, and is sometimes used when building low level communication libraries.
+%        Not used directly by uenv that use cray-mpich or NCCL without a custom libfabric implementation.
+%    \item SLURM: in theory packages can depend on SLURM, but in practice it has not been picked up in any uenv.
+%\end{itemize}
+
+
+%To these ends, we use a devops pipeline to deploy
+%\begin{itemize}
+%    \item The uenv image recipes (YAML files) are maintained in a GitHub repository\footnote{\href{https://github.com/eth-cscs/alps-uenv}{\lst{github.com/eth-cscs/alps-uenv}}}.
+%    \item To add a new uenv recipe or update an existing recipe, a pull request is made to the repository.
+%    \item Comments on pull requests trigger a pipeline that builds and tests the uenv image: e.g \lst{system=daint;uarch=gh200;uenv=vasp:v6.5.0}
+%    \begin{itemize}
+%        \item Only CSCS staff on a whitelist are able to trigger builds.
+%        \item Only CSCS staff on a whitelist are able to trigger builds.
+%    \end{itemize}
+%    \item A GitLab runner that launches build and test stages on the target cluster.
+%    \item A ReFrame test suite that selects the appropriate tests to run after building the uenv.
+%\end{itemize}
+
+%\todo{expand the points below. Provide an example of the oras commands used to push, pull and attach meta data}
+
+%The build pipeline generates two artifacts: a squashfs image and image meta data, which are pushed to an on-premises container registry.
+%The registry is provided by JFrog\footnote{\href{https://jfrog.com}{\lst{jfrog.com}}}, and Oras\footnote{\href{https://oras.land}{\lst{oras.land}}} is used to push and pull images, so any DockerHub API compatible registry would work.
+%The images are stored in a \lst{build} namespace, with a tag that corresponds to the unique id of the CI/CD job that built the image, for example:
+%\begin{lstlisting}
+%jfrog.svc.cscs.ch/uenv/build/daint/gh200/vasp/v6.5.0:1631426005
+%\end{lstlisting}
+
+%The final deployment is manual, because we find that it is often necessary to first perform additional testing such as providing the image to selected users for validation.
+%Deployment is performed using the CLI tool (see~\sect{sec:cli}):
+%\begin{lstlisting}
+%uenv image copy build::vasp:1631426005 \
+%                deploy::vasp/v6.5.0:v1@daint
+%\end{lstlisting}
+%Once deployed, the image is available for users to pull and run.
 

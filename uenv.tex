@@ -1,7 +1,7 @@
-A command line tool called \emph{uenv} is the main interface for uenv users, alongside the SLURM plugin which is documentated in \sect{sec:slurm}.
+A command line tool called \emph{uenv} is the main interface for uenv users, alongside the SLURM plugin which is documented in \sect{sec:slurm}.
 
 The uenv tool and SLURM plugin are written in C++, with a library that is used by both, in an open-source GitHub repository\footnote{\href{https://github.com/eth-cscs/uenv2}{\lst{github.com/eth-cscs/uenv2}}}.
-The uenv command line tool is a statically-lined executable, and is bundled with the SLURM plugin in a single RPM, for ease of installation.
+The uenv command line tool is a statically-linked executable, and is bundled with the SLURM plugin in a single RPM, for ease of installation.
 
 %---------------------------------------------------
 \miniheader{Image Management}
@@ -36,7 +36,7 @@ The database \lst{index.db} at the root of the repository allows for mapping the
 Each image is stored in a path that matches its hash, with the following information:
 \begin{itemize}
 \item  \lstinline{store.squashfs}: the SquashFS file;
-\item  \lstinline{env.json}: information about the mount point, uenv description, and view discriptions (their name, and the environment variable updates that they aplly).
+\item  \lstinline{env.json}: information about the mount point, uenv description, and view descriptions (their name, and the environment variable updates that they aplly).
 \item  \lstinline{recipe}: the original recipe used to build the image;
 \item  \lstinline{extra/reframe.yaml}: description of the testable features the uenv implements, and how to configure the environment to test them.
 \end{itemize}
@@ -47,7 +47,7 @@ Users can query images in the registries and repositories using the \lst{uenv im
 \lstinputlisting[language=bash]{code/uenv-ls.sh}
 
 The \lst{uenv image pull} command is used to pull an image from a remote registry.
-The following example searches for all vasp images built for the system daint, pulls one of them, then uses the \lst{image ls} command to show the downloaded image in the local repository:
+The following example searches for all vasp images built for the system Daint, pulls one of them, then uses the \lst{image ls} command to show the downloaded image in the local repository:
 \lstinputlisting[language=bash]{code/uenv-findpull.sh}
 
 It is possible add and remove images from a local repository using the \lst{uenv image add} and \lst{uenv image rm} commands respectively.
@@ -55,7 +55,7 @@ It is possible add and remove images from a local repository using the \lst{uenv
 Copying and deleting images in a registry using \lst{uenv image copy} and \lst{uenv image delete} respectively requires permission, which is restricted to the team at CSCS responsible for image deployment.
 The \lst{image copy} command is used to deploy by copying images from the \emph{build} namespace (where the CI/CD pipeline pushes them after), to the \emph{deploy} namespace:
 \lstinputlisting[language=bash]{code/uenv-deploy.sh}
-Note that only one SquashFS image is stored after the two copies in the example above -- each copy creates a new label that is attached to the original SquashFS image.
+Note that only one \squashfs image is stored after the two copies in the example above -- each copy creates a new label that is attached to the original \squashfs image.
 
 %---------------------------------------------------
 \miniheader{Loading uenv}
@@ -67,7 +67,7 @@ Loading a uenv provides the software in the \squashfs by mounting the squashfs i
 The uenv CLI uses the \lst{squashfs-mount} command line utility -- a small \lst{setuid} executable that creates a new mount namespace, mounts the SquashFS file through \lst{libmount}, drops privileges and executes a given command.
 The following example starts a bash shell with the Squashfs files \lst{img1.sqfs} and \lst{img2.sqfs} are mounted at \lst{/mnt1} and \lst{/mnt2} respectively:
 \lstinputlisting[language=bash]{code/squashfs-mount.sh}
-The utility is open source, \href{https://github.com/eth-cscs/squashfs-mount}{available on GitHub} and includes RPMs for installation on Cray EX.
+The utility is open source, available on GitHub\footnote{\href{https://github.com/eth-cscs/squashfs-mount}{\lst{github.com/eth-cscs/squashfs-mount}}}, and includes RPMs for installation on Cray EX.
 
 The second part of loading an environment is to set any relevant environment variables.
 Each uenv image can provide any number of \emph{views}, which are defined defined in the \lst{meta/env.json} file in the \squashfs file.

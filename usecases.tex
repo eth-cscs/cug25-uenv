@@ -1,21 +1,12 @@
 %------------------------------------------------------------------------------
-\subsection{Standard Environment}
-%------------------------------------------------------------------------------
-
-A uenv that provides up to date and modern command line tools, can be mounted on a vCluster.
-The package includes editors (e.g. \emph{neovim} and \emph{emacs}), search tools (e.g. \emph{fd} and \emph{ripgrep}), and up to date programming language tools (\emph{lua}, \emph{go}, \emph{rust} and \emph{python}).
-
-The uenv is mounted on the nodes using the equivalent to the following command:
-\lstinputlisting[language=bash]{./code/manual-uenv-mount.sh}
-using a service that can update the mounted image without rebooting the node.
-
-%------------------------------------------------------------------------------
 \subsection{JupyterHub}
 %------------------------------------------------------------------------------
 
 CSCS provides a JupyterHub web portal for users to access Alps through Jupyter notebooks, which requires the Jupyter software stack installed on the cluster where the session will run.
-The approach taken by CSCS is to create a simple \lst{jupyter} uenv that provides only Jupyter and it's requirements.
+The approach taken by CSCS is to create a simple \lst{jupyter} uenv that provides only Jupyter and its requirements.
 This uenv is automatically mounted by the JuputerHub service, alongside a uenv selected by the user, which provides the scientific software required.
+
+User feedback is that the environment feels more responsive than when it was installed on a shared filesystem, which is a result of using \squashfs.
 
 %------------------------------------------------------------------------------
 \subsection{Weather Service Production}
@@ -28,4 +19,21 @@ Both stacks are implemented in one uenv, that is mounted permanently at \lst{/mc
 Due to their strict operational requirements, MCH are naturally very conservative and cautious.
 Using uenv has been beneficial because to test a new operational environment the CLI and SLURM plugin can be used to create a session with the new stack mounted on the current stack to perfectly replicate what the permanent deployment would look like.
 As we have gained confidence with this approach, we have been able to start splitting the MCH workflow into completely separate environments that are updated at different cadences -- an approach that they would not have agreed to two years ago.
+
+%------------------------------------------------------------------------------
+\subsection{Optimizing Python installations with \squashfs}
+\label{sec:usecase-squashfs}
+%------------------------------------------------------------------------------
+
+The uenv CLI and SLURM plugin support mounting multiple uenv in the same session -- a feature developed for mounting tools like the debuggers and profilers at the same time as a programming environment or application.
+The \squashfs files do not need to be uenv, any \squashfs file can be mounted at an arbitrary location.
+
+A common Python workflow is to use a uenv that provides Python, MPI and other libraries, then use pip to install additional packages in a virtual environment on the Lustre filesystem.
+For example the following installation of PyTorch:
+\lstinputlisting[language=bash]{code/venv.sh}
+Installing this on a Grace-Hopper node created over 22,000 inodes in the virtual environment, which leads to long initialisation times for Python scripts that load the modules therein.
+\lstinputlisting[language=bash]{code/venv-sqfs.sh}
+
+Using \squashfs to reduce file system pressure can have a significant impact -- users report up to 5$\times$ speedup for some Python workflows.
+Improving support for creating and using \squashfs images in common workflows will be a focus of future work.
 
