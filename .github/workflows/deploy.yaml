@@ -1,0 +1,35 @@
+name: deploy github pages
+
+on:
+  workflow_run:
+    workflows: [build-mkdocs]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-site
+          path: site/docs
+
+     #- name: Download slides artifact
+     #  uses: actions/download-artifact@v4
+     #  with:
+     #    name: slides-site
+     #    path: site/slides
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: site
+          publish_branch: gh-pages
+          force_orphan: true
+
