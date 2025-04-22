@@ -1,6 +1,6 @@
 # CUG 2025
 
-hello world
+This page collects the presentations and other material used to present CSCS' use of uenv and CPE in a container at CUG 2025.
 
 <div class="grid cards" markdown>
 
