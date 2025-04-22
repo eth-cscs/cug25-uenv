@@ -1,6 +1,6 @@
 # CUG 2025
 
-TEST
+hello world
 
 <div class="grid cards" markdown>
 

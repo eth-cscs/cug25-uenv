@@ -1,14 +1,40 @@
-name: ci
+name: Build and Deploy MkDocs
+
 on:
   push:
-    branches:
-      - main
-permissions:
-  contents: write
+    branches: [main]  # or your default branch
+  workflow_dispatch:
+
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required to push to repo (for deploy-from-action)
+      pages: write     # Required if deploying via GitHub Pages Action
+      id-token: write  # Required for GitHub Pages deployment from Action
+
     steps:
-      - uses: actions/checkout@v4
-      - run: pip install -r requirements.txt
-      - run: mkdocs gh-deploy --force
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install MkDocs and dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Build documentation
+        run: mkdocs build
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
