@@ -1,9 +1,8 @@
 site_name: uenv and CPE Containers @ CUG 2025
-# TODO: change to https://docs.cscs.ch when the time comes
 site_url: https://eth-cscs.github.io/cug25-uenv
 
 # provide a link to the docs in top RHS corner
-repo_url: https://github.com/eth-cscs/cscs-docs
+repo_url: https://github.com/eth-cscs/cug25-uenv
 # provide a link to "edit this page" to each page
 edit_uri: edit/main/docs/
 extra_css:
