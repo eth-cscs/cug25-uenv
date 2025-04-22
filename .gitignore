@@ -1,17 +1,1 @@
-paper.pdf
-slides.pdf
-
-# latex artifacts
-bibup
-paper.bbl
-*.log
-*.blg
-*.aux
-*.out
-*.nav
-*.snm
-*.toc
-*.vrb
-
-# vim swap files
-*.swp
+site
