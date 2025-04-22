@@ -27,8 +27,22 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Build documentation
+      - name: Build MkDocs
         run: mkdocs build
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: tutorial setup
+        working-directory: slides/tutorial
+        run: |
+          npm i -g @antfu/ni
+          nci
+
+      - name: tutorial build
+        working-directory: slides/tutorial
+        run: nr build --base /${{github.event.repository.name}}/slides/tutorial --out ../dist/slides/tutorial
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
