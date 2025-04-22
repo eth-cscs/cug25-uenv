@@ -42,7 +42,11 @@ jobs:
 
       - name: tutorial build
         working-directory: slides/tutorial
-        run: nr build --base /${{github.event.repository.name}}/slides/tutorial --out ../dist/slides/tutorial
+        run: |
+          nr build --base /${{github.event.repository.name}}/slides/tutorial --out ../dist/slides/tutorial
+          nr build --base /${{github.event.repository.name}}/slides/tutorial --out ../../site/slides/tutorial
+
+      - run: ls -R ./site
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
