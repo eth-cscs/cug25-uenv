@@ -2,8 +2,8 @@
 theme: ./slidev-theme-cscs
 ---
 
-# uenv on Alps
-<br>
+## Hands on with uenv and CPE in a container with
+## Grace Hopper on Alps
 
 Ben Cumming
 
@@ -21,13 +21,6 @@ On Daint, Santis and Clariden CSCS supports two software environments:
 
 Daint has the Cray Programming Environment modules (CPE) installed through the `cray` module:
 * provided "as is" -- will be deployed via containers to provide up-to-date versions.
-
-Eiger provides:
-* CPE and EasyBuild recipes
-* uenv
-* Sarus for containers
-
-**Eiger will be updated to [match Daint by June](https://status.cscs.ch/status-page/9e188a14-9e52-4a14-af4b-b9299bf1c719/announcements/cbc0c451-e8d4-4af1-9475-4408b5ee9009)** - a test cluster will be available for preparation.
 
 ---
 layout: two-cols
