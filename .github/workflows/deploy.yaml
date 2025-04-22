@@ -30,6 +30,7 @@ jobs:
         with:
           name: docs-site
           path: site
+      - run: ls -R ./site
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v3
