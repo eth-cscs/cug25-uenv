@@ -6,19 +6,21 @@ This approach is used by \stackinator, however it can also be used directly with
 \todo{add some more color about stackinator: changes since 2023; per-stack spack versioning; site repo; how all this minimises the Spack upgrade pain.}
 \subsubsection{Customizing networking}
 \label{sec:networking}
-Whilst support for \craympich is mature and well tested, we wish to provide enough flexibility to allow further customization of networking libraries such as
+Although support for \craympich is mature and well tested, it relies on an external package installed via RPM,
+the recent release of source codes for \slingshot libraries (\lst{libcxi}, \lst{cxi-drivers}, \lst{cassini-headers}) and their associated libfabric \lst{cxi} provider,
+gives us the incentive to provide more flexibility in networking layer customization, including:
 \begin{itemize}
-    \item linking \craympich to non default versions of Slingshot dependencies
-    \item providing support for non-vendor provided MPI implementations such as OpenMPI
-    \item allowing custom versions/branches and options for both top level (MPI) and dependent libraries (libfabric, cxi, etc)
+    \item linking \craympich to non default (compiled from source) versions of \slingshot dependencies
+    \item supporting non-vendor provided MPI implementations such as OpenMPI
+    \item allowing custom versions/feature branches and options for both top level (MPI) and dependent libraries (\lst{libfabric}, \lst{cxi}, etc)
 \end{itemize}
-To support this, we have extended the \lst{network} section of the \stackinator YAML recipe format where users can override the defaults setup by cluster managers. The following extract \ref{fig:openmpi-config} shows how one can customize all aspects of the networking stack using the rich sytax already provided by spack.
+To achieve this, we have extended the \lst{mpi} section of the \stackinator YAML recipe so that users can override the defaults setup by cluster managers. The following extract (fig \ref{lst:openmpi-config}) shows how one can redefine the networking stack using the familiar spack syntax (note that yaml tags shown may change prior to next release). When combined with \stackinator's existing \lst{package} customizations (where \lst{package_attributes} such as \lst{git} repository/location may be set), the new options give total control over the network configuration.
 \begin{figure}[htp!]
     \lstinputlisting[language=yaml]{code/openmpi.yaml}
     \caption{Specifying a custom developer version of OpenMPI}
-    \label{fig:openmpi-config}
+    \label{lst:openmpi-config}
 \end{figure}
-Stackinator, already supports \lst{package.yaml} customizations, which can be used to override other defaults such as \lst{package_attributes} that specify the git repository location etc.
+A user may leave the default \craympich version, but override \lst{depends} section to only change drivers, or override the \lst{mpi} spec entirely and provide custom versions of any or all of the dependencies
 
 \todo{NVIDIA libraries}
 
