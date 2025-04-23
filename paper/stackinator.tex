@@ -14,13 +14,16 @@ gives us the incentive to provide more flexibility in networking layer customiza
     \item supporting non-vendor provided MPI implementations such as OpenMPI
     \item allowing custom versions/feature branches and options for both top level (MPI) and dependent libraries (\lst{libfabric}, \lst{cxi}, etc)
 \end{itemize}
-To achieve this, we have extended the \lst{mpi} section of the \stackinator YAML recipe so that users can override the defaults setup by cluster managers. The following extract (fig \ref{lst:openmpi-config}) shows how one can redefine the networking stack using the familiar spack syntax (note that yaml tags shown may change prior to next release). When combined with \stackinator's existing \lst{package} customizations (where \lst{package_attributes} such as \lst{git} repository/location may be set), the new options give total control over the network configuration.
+To achieve this, we have extended the \lst{mpi} section of the \stackinator YAML recipe so that users can override the defaults setup by cluster managers. The following extract (fig \ref{lst:openmpi-config}) shows how one can redefine the networking stack using the familiar spack syntax (note that yaml tags shown may change prior to next release). When combined with \stackinator's existing \lst{package} customizations (where \lst{package_attributes} such as \lst{git} repository/location may be set), the new options give total control over the network configuration on a per cluster basis.
 \begin{figure}[htp!]
     \lstinputlisting[language=yaml]{code/openmpi.yaml}
     \caption{Specifying a custom developer version of OpenMPI}
     \label{lst:openmpi-config}
 \end{figure}
-A user may leave the default \craympich version, but override \lst{depends} section to only change drivers, or override the \lst{mpi} spec entirely and provide custom versions of any or all of the dependencies
+A user may leave the default \craympich version, but override the \lst{depends} section to change drivers, or override the \lst{mpi} spec entirely as well as providing custom versions of any or all of the dependencies
+
+Currently the \slingshot sources must be tested carefully for compatibility since official release versions are not regularly made,
+git SHA refs are used to identify versions used in \stackinator defaults. As the recipes become more widely used and tested, concrete versions will be chosen for stable uenv deployment.
 
 \todo{NVIDIA libraries}
 
