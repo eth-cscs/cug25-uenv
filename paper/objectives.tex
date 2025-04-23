@@ -1,13 +1,15 @@
-We first establish concrete objectives that define the requirements for deploying software on HPC systems. These objectives can be used to evaluate the effectiveness of our proposed solutions. The objectives span technical, operational, and organizational aspects of software deployment.
+We first establish concrete objectives that define the requirements for deploying software on HPC systems.
+These objectives can be used to evaluate the effectiveness of our proposed solutions.
+The objectives span technical, operational, and organizational aspects of software deployment.
 
 %------------------------------------------------------------------------------
 \subsection{Provide optimized software}
 %------------------------------------------------------------------------------
 
 Libraries that implement inter-node communication, for example MPI and NCCL, need to be optimized for the Slingshot 11 network in HPE Cray-EX systems.
-The method used by \stackinator to install \craympich using Spack~\cite{gamblin:sc15} outside the CPE was demonstrated in~\cite{uenv2023} 
+The method used by \stackinator to install \craympich using \spack~\cite{gamblin:sc15} outside the CPE was demonstrated in~\cite{uenv2023} 
 
-To support all applications, we require similarly robust methods for installing packages like OpenMPI, NCCL, \nvshmem, \cufftmp and \cusolvermp and with libfabric support:
+To support more applications, including ML/AI and commercial applications , similarly robust methods are required for installing packages like OpenMPI, NCCL, \nvshmem, \cufftmp and \cusolvermp and with libfabric support:
 \begin{itemize}
     \item \textbf{aim}: we can deploy OpenMPI with Slingshot 11 support;
     \item \textbf{aim}: build libfabric and CXI from source.
