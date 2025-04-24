@@ -6,7 +6,7 @@ The use case of using \squashfs for user-installed software and datasets is prom
 However, the workflow for doing this is ad-hoc.
 We will add support for ``environment definitions'' in YAML files, that provide a list of uenv and additional \squashfs images to mount, with additional environment variables to set.
 
-Currently the tools can't be deployed at another site without some significant and customization.
+Currently the tools can't be deployed as a turnkey solution at another site.
 Take, for example, the container registry support: this uses hard-coded address of the JFrog artifactory at CSCS.
 However, all interactions with the registry are generic and could be used with any OCI container registry, for example DockerHub or the Github Container Registry.
 If there is interest from other sites, we could make it easier to configure uenv for different sites with little effort.

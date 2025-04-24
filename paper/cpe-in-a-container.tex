@@ -24,10 +24,11 @@ Once we have an account with HPE, generated an access token and settled on the o
 \end{itemize}
 
 When building CPE in a container with GPU support, it is necessary to install also NVIDIA CUDA, which is provided as an RPM repository by NVIDIA.
-A \lst{Dockerfile} to build CPE in a container can be found at \lstinline{https://github.com/eth-cscs/cpe-containers}. The Dockerfile is parametrized to allow installing different versions of CPE,
+A \lst{Dockerfile} to build CPE in a container can be found on CSCS' GitHub\footnote{\href{https://github.com/eth-cscs/cpe-containers}{\lstinline{github.com/eth-cscs/cpe-containers}}}. The Dockerfile is parametrized to allow installing different versions of CPE,
 Every CPE release requires slightly varying packages to be installed, mostly the versions need to be adapted.
 We are building CPE container images for the GNU and Cray programming environment, with one container image for each.
-This allows us to load default modules when the container is instantiated, such that the programming environment is directly available without explicit \lst{module load PrgEnv-gnu}.
+This allows us to load default modules when the container is instantiated, such that the programming environment is directly available without, for example, typing \lst{module load PrgEnv-gnu}.
+
 The default list of modules loaded at startup is also parametrized in the Dockerfile, with the defaults chosen to initialise an environment that is ready to compile applications for the target architecture.
 For example, this is the module list for \lst{cpe-gnu} on the Grace Hopper nodes is:
 \begin{itemize}
@@ -61,16 +62,10 @@ Once the image is deployed to the registry, it can be pulled on the target syste
 \label{sec:cpe-container-use}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\todo{describe how the containers are used.}
-
-\begin{itemize}
-       \item Alps uses forks of the \href{https://github.com/NVIDIA/enroot}{enroot} container runtime and \href{https://github.com/NVIDIA/pyxis}{Pyxis} Slurm plugin to provide an integrated container solution.
-       \item HPE have improved the modularity of CPE packageing, and started releasing them through a new \href{https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html}{RPM repository} that can be used directly in Dockerfiles.
-\end{itemize}
-With the SLURM integration from Pyxis, starting a job with the CPE is simple, for example starting an interactive shell on a compute node with a specific release of CPE:
+Alps uses forks of the \href{https://github.com/NVIDIA/enroot}{enroot} container runtime and \href{https://github.com/NVIDIA/pyxis}{Pyxis} \slurm plugin to provide an integrated container solution.
+With the \slurm integration from Pyxis, starting a job with the CPE is simple, for example starting an interactive shell on a compute node with a specific release of CPE:
 \begin{lstlisting}
-srun --environment=cpe-24.7 --pty bash
+srun --environment=cpe-gnu-24.7 --pty bash
 \end{lstlisting}
-The container environment is transparent to users, because the Slurm plugin mounts the scratch filesystem so that software built on scratch will persist between invocations.
-The instantiation of the container is very much equivalent of a \lstinline{module load PrgEnv-gnu}. Additional modules like \lst{hdf5}, if needed, can be loaded by the user.
-
+The container environment is transparent to users, because the \slurm plugin mounts the scratch filesystem so that software built on scratch will persist between invocations.
+The instantiation of the container is equivalent to \lstinline{module load PrgEnv-gnu}.

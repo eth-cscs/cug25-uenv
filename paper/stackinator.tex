@@ -1,34 +1,45 @@
-The  \stackinator tool, that is used to generate squashfs images from a YAML-based recipe, was documented in detail at CUG 2023~\cite{uenv2023}.
+The  \stackinator tool, used to generate squashfs images from a YAML-based recipe, was described in detail at CUG 2023~\cite{uenv2023}.
 The implementation details of \stackinator were covered in that paper, and have not changed materially.
 The method used by \stackinator to install \craympich using Spack~\cite{gamblin:sc15} outside the CPE was demonstrated was shown in~\cite{uenv2023}
 This approach is used by \stackinator, however it can also be used directly with Spack -- CSCS staff use it to install the most recent versions of \craympich on LUMI.
 
-\todo{add some more color about stackinator: changes since 2023; per-stack spack versioning; site repo; how all this minimises the Spack upgrade pain.}
-\subsubsection{Customizing networking}
-\label{sec:networking}
-Although support for \craympich is mature and well tested, it relies on an external package installed via RPM,
-the recent release of source codes for \slingshot libraries (\lst{libcxi}, \lst{cxi-drivers}, \lst{cassini-headers}) and their associated libfabric \lst{cxi} provider,
-gives us the incentive to provide more flexibility in networking layer customization, including:
+Stackinator has not needed fundamental modification since the original paper.
+There have been quality of life improvements, and the main new feature is improved support for generating \emph{views}: flexible descriptions of how to modify (add, update or remove) environment variables when a uenv is loaded.
+
+After two years of using Stackinator, we have observed that specifying version of Spack to use when building a uenv is defined in the recipe has been beneficial.
+The alternative approach is to fix the version of Spack at a site-level, build a Spack repository of site-specific and customised Spack packages, and install all software using that version of Spack.
+Our approach reduces the overhead of upgrading the version of Spack: each recipe upgrades when it is ready, and maintains a small set of custom packages (it any at all).
+There is a small centrally-managed Spack repository (\lst{cray-mpich}, its dependencies and customisations of \lst{nvhpc} and \lst{cuda}).
+The approach is not perfect -- Stackinator has to detect which version of Spack is being used, and customise the configuration to work around breaking changes introduced in each version of Spack.
+Furthermore, the next version of Spack will be 1.0, which introduces larger breaking changes, which will require changing the recipe format, which in turn more tightly couples the version of Stackinator with the recipe.
+
+One of the large changes introduced to Spack is builtin packages for the recently open-sourced HPE \slingshot libraries (\lst{libcxi}, \lst{cxi-drivers}, \lst{cassini-headers}), which are required to build our own network stack and properly support.
+We had hoped to show mature support for OpenMPI and NVIDIA communication libraries in the final version of this paper, however back-porting these packages to the most recent v0.23 release of Spack wasn't practical, so the results here are not deployed in the production pipeline in~\sect{sec:cicd}.
+
+%----------------------------------------------------------------------------
+\subsubsection{Libfabric and OpenMPI}
+\label{sec:network-libfabric}
+%----------------------------------------------------------------------------
+
+Although support for \craympich is mature and well tested, it relies on an external package installed via RPM, namely libfabric.
+The recent release of source codes for \slingshot libraries (\lst{libcxi}, \lst{cxi-drivers}, \lst{cassini-headers}) and their associated libfabric CXI provider gives us the incentive to provide more flexibility in networking layer customization, including:
 \begin{itemize}
-    \item linking \craympich to non default (compiled from source) versions of \slingshot dependencies
-    \item supporting non-vendor provided MPI implementations such as OpenMPI
-    \item allowing custom versions/feature branches and options for both top level (MPI) and dependent libraries (\lst{libfabric}, \lst{cxi}, etc)
+    \item linking \craympich to non default (compiled from source) versions of \slingshot dependencies;
+    \item supporting non-vendor provided MPI implementations such as OpenMPI;
+    \item allowing custom versions/feature branches and options for both top level (MPI) and dependent libraries (\lst{libfabric}, \lst{cxi}, etc).
 \end{itemize}
-To achieve this, we have extended the \lst{mpi} section of the \stackinator YAML recipe so that users can override the defaults setup by cluster managers. The following extract (fig \ref{lst:openmpi-config}) shows how one can redefine the networking stack using the familiar spack syntax (note that yaml tags shown may change prior to next release). When combined with \stackinator's existing \lst{package} customizations (where \lst{package_attributes} such as \lst{git} repository/location may be set), the new options give total control over the network configuration on a per cluster basis.
+
+To achieve this, we have extended the \lst{mpi} specification of the \stackinator YAML recipe so that users can override the defaults setup by cluster managers.
+The following extract (fig \ref{lst:openmpi-config}) shows how one can redefine the networking stack using the familiar spack syntax (note that yaml tags shown may change prior to next release).
+When combined with \stackinator's existing \lst{package} customizations (where \lst{package_attributes} such as \lst{git} repository/location may be set), the new options give total control over the network configuration on a per cluster basis.
+
 \begin{figure}[htp!]
     \lstinputlisting[language=yaml]{code/openmpi.yaml}
     \caption{Specifying a custom developer version of OpenMPI}
     \label{lst:openmpi-config}
 \end{figure}
-A user may leave the default \craympich version, but override the \lst{depends} section to change drivers, or override the \lst{mpi} spec entirely as well as providing custom versions of any or all of the dependencies
 
-Currently the \slingshot sources must be tested carefully for compatibility since official release versions are not regularly made,
-git SHA refs are used to identify versions used in \stackinator defaults. As the recipes become more widely used and tested, concrete versions will be chosen for stable uenv deployment.
+By default \craympich is installed, and this new feaature makes it possible to override the \lst{depends} section to change drivers, or override the \lst{mpi} spec entirely as well as providing custom versions of any or all of the dependencies
 
-\todo{NVIDIA libraries}
-
-This section will focus on Spack packing for other key libraries that implement inter-node communication -- for example MPI, NCCL and \nvshmem -- need to be optimized for the Slingshot 11 network in HPE Cray-EX systems.
-
-We will focus on three main sets of libraries. The first is building OpenMPI with libfabric support, in order to provide an alternative to \craympich when there are bugs or performance regressions for specific applications, and to support software that is distributed as binaries linked against OpenMPI. The second is how to build the open source libfabric and CXI driver software for Slingshot 11. Finally, we will show how we adapt \cufftmp and \cusolvermp, which are distributed as pre-build binaries for infiniband, to use \nvshmem with libfabric support, which we developed in collaboration with NVIDIA.
-
-Note that while these methods are integrated into Stackinator, they can be used directly by Spack. All Spack packages, scripts and guides will be made available on GitHub for readers to use.
+Currently the \slingshot sources must be tested carefully for compatibility since official release versions are not regularly made, so git SHA refs are used to identify versions used in \stackinator defaults.
+As the recipes become more widely used and tested, concrete versions will be chosen for stable uenv deployment.

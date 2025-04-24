@@ -5,8 +5,8 @@ Here we review the original objectives.
 
 Deployment of key software like MPI, compilers and NVIDIA tools via uenv is on par with or better than CPE.
 
-Our efforts to deploy libfabric, OpenMPI and NVIDIA libraries that are tuned for the system are ongoing, with that provide them available for early testing on the system.
-Robust deployment of these components will require the release of Spack 1.0 and improved versioning and release management of the open sourced CXI, Cassini headers and libfabric from HPE.
+Our efforts to deploy libfabric, OpenMPI and NVIDIA libraries that are tuned for the system are ongoing, and we have provided them for early testing on Alps.
+Robust deployment of these components will require the release of Spack 1.0, and improved versioning and release management of the open sourced CXI, Cassini headers and libfabric from HPE.
 
 \subsubsection{Gitops deployment}
 
@@ -19,18 +19,18 @@ Currently the process of rebuilding from a uenv image is quite manual, and is so
 
 \subsubsection{Decouple environments}
 
-New versions of uenv images can be deployed, without removing or modifying existing environments, so workflows are not affected and can upgrade at their own pace.
+New versions of uenv images can be deployed, without removing or modifying existing environments, so users are not affected and can upgrade at their own pace.
 
-This paper did not cover changes to the base OS that is installed on a cluster are managed -- they are tracked in a separate configuration repository.
-To date we have only had one breaking change on the system, whereby the libfabric installed as part of the Slingshot host software changed location after an upgrade.
+This paper did not cover how changes to the base OS that is installed on a cluster are tracked in a separate configuration repository.
+To date there has only been one breaking change on the system, where the libfabric installed as part of the \slingshot host software changed location after an upgrade.
 We were able to work around this issue without rebuilding uenv images, however we have the ability to rebuild images in such situations, and our ongoing efforts to install Slinghshot from source inside uenv will further migigate these risks.
 
-Finally, uenv that provide the latest version of cray-mpich are deployed days after it is released, along with uenv that use the pre-release of cray-mpich 9.0 for testing.
+Finally, uenv that provide the latest version of cray-mpich are deployed days after it is released, along with uenv and CPE containers that use the pre-release of cray-mpich 9.0, for early testing.
 
-\subsection{End to end responsibility for software support teams}
+\subsubsection{End to end responsibility for software support teams}
 
 This has been one of the main outcomes of this work -- teams across CSCS are deploying full software stacks with very little central coordination, and with no interaction with system administrators.
-See~\sect{discuss-wc} for an example of how users have started deploying their own software stacks.
+See~\sect{sec:discuss-wc} for an example of how users have started deploying their own software stacks.
 
 \subsection{Maintenance overheads}
 \label{sec:discuss-staff}
@@ -38,7 +38,7 @@ See~\sect{discuss-wc} for an example of how users have started deploying their o
 Maintaining the Stackinator tool, the CI pipeline,  and uenv tools is not free -- a core team of two staff performs this work.
 One works 75\% on the effort, and the other about 25\%.
 CSCS staff actively contribute fixes of their own volition, and contribute to discussions about the architecture and design of the system.
-Now that the system is mature, the effort required to maintain it is less than the effort required to develop it.
+Now that the system is mature, the effort required to maintain it is less than during its development.
 Overall, the amount of effort required to set up the deployment pipeline and tooling was greater than what was required for the system that it replaced, however this system is more powerful and flexible.
 
 One side effect of this effort is that by decoupling deployment of software environments, a lot more software is being deployed than on the old Piz Daint Cray XC system.
@@ -62,7 +62,7 @@ The current solution was not part of a master-plan, instead it is a happy conseq
 \subsection{Deploying outside CSCS}
 \label{sec:discuss-site}
 
-Much of what has been presented here is site-specific: the on-site container registry and ci/cd infrastructure would be different.
+Much of what has been presented here is site-specific: the on-site container registry and ci/cd infrastructure would be different if this was implemented elsewhere.
 The processes and lessons are transferable, however what we have presented is not a turnkey solution.
 
 The main software tools for building and using uenv are quite easy to get running locally.

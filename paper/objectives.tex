@@ -12,9 +12,11 @@ The method used by \stackinator to install \craympich using \spack~\cite{gamblin
 To support more applications, including ML/AI and commercial applications , similarly robust methods are required for installing packages like OpenMPI, NCCL, \nvshmem, \cufftmp and \cusolvermp and with libfabric support:
 \begin{itemize}
     \item \textbf{aim}: we can deploy OpenMPI with Slingshot 11 support;
-    \item \textbf{aim}: build libfabric and CXI from source.
-    \item \textbf{aim}: we can deploy key NVIDIA communication libraries on Slingshot 11;
+    \item \textbf{aim}: build libfabric and CXI from source;
+    \item \textbf{aim}: we can deploy key NVIDIA communication libraries on Slingshot 11.
 \end{itemize}
+
+Note that the NVIDIA libraries are not discussed in this paper, because we ran out of time to finish test before publication.
 
 %------------------------------------------------------------------------------
 \subsection{Gitops deployment}

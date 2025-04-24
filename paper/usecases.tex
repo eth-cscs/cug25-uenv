@@ -32,6 +32,8 @@ A common Python workflow is to use a uenv that provides Python, MPI and other li
 For example the following installation of PyTorch:
 \lstinputlisting[language=bash]{code/venv.sh}
 Installing this on a Grace-Hopper node created over 22,000 inodes in the virtual environment, which leads to long initialisation times for Python scripts that load the modules therein.
+
+The Python venv in \lst{\$SCRATCH/env/.venv} can be turned into a single \squashfs file that can be mounted over the original venv as followd:
 \lstinputlisting[language=bash]{code/venv-sqfs.sh}
 
 Using \squashfs to reduce file system pressure can have a significant impact -- users report up to 5$\times$ speedup for some Python workflows.
