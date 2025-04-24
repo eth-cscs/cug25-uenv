@@ -1,5 +1,5 @@
 mpi:
-  spec: openmpi@feature-5.0.6=5.0.6
+  spec: openmpi@git.feature-5.0.6=main
   depends:
   - libfabric@git.lnx_refactor_main=main +debug fabrics=lnx,cxi,rxm,tcp,shm dev_path=/scratch/libfabric
   - libcxi@main
