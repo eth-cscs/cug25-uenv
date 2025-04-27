@@ -34,17 +34,26 @@ jobs:
         with:
           node-version: 'lts/*'
 
-      - name: tutorial setup
+      - name: tutorial slides
         working-directory: slides/tutorial
         run: |
           npm i -g @antfu/ni
           nci
-
-      - name: tutorial build
-        working-directory: slides/tutorial
-        run: |
-          nr build --base /${{github.event.repository.name}}/slides/tutorial --out ../dist/slides/tutorial
           nr build --base /${{github.event.repository.name}}/slides/tutorial --out ../../site/slides/tutorial
+
+      - name: paper slides
+        working-directory: slides/paper
+        run: |
+          npm i -g @antfu/ni
+          nci
+          nr build --base /${{github.event.repository.name}}/slides/paper --out ../../site/slides/paper
+
+      - name: cpe slides
+        working-directory: slides/cpe
+        run: |
+          npm i -g @antfu/ni
+          nci
+          nr build --base /${{github.event.repository.name}}/slides/cpe --out ../../site/slides/cpe
 
       - run: ls -R ./site
 
