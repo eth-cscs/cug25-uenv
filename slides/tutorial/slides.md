@@ -368,7 +368,7 @@ The uenv and view will be loaded inside the script, and for the first `srun` cal
 #SBATCH --ntasks-per-node=1
 
 # run a serial pre processing step
-uenv run --uenv=prgenv-gnu/24.11 --view=default \
+uenv run prgenv-gnu/24.11 --view=default \
     python3 ./generate-inputs.py
 
 # run the simulation
