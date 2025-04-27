@@ -23,8 +23,6 @@ CUG 2025 PEAD BoF
 * non-admin CSCS staff (glorified users) can deploy new images
 * roll back and upgrade is trivial
 
-Shout out to Andreas Fink and Theofilos Manitaras at CSCS.
-
 ---
 
 # HPE RPM repository
@@ -43,8 +41,6 @@ Access requires a HPE Passport account and a token
 CSCS create a proxy repository:
 * for fast local acces
 * to add missing packages
-
-**Talking point**: What is HPE's road map for the repository?
 
 ---
 
@@ -65,7 +61,7 @@ We provide separate containers for each programming environment
 
 ---
 
-# Step 3: Build with CI/CD
+# Build with CI/CD
 
 We use leverage our "CI/CD Container Build Service" for GitHub to build and test CPE containers
 
@@ -79,11 +75,33 @@ We use leverage our "CI/CD Container Build Service" for GitHub to build and test
 
 ---
 
-# Step 4: Deploy to system
+# Deploy to system
 
-Download and store the images in a centrally managed location
+Download and store the images on a shared filesystem and configured for all users on the system.
 
+**EXAMPLE** to start an interactive session
 ```
-srun --environment=cray-cpe/25.3 --pty bash
+srun --environment=cpe-cray/25.3 --pty bash
 ```
+
+* the scratch filesystem is mounted automatically inside the container;
+* users can further customise what to mount and configure.
+
+What about **rollback**?
+* upgrades and bug fixes are deployed as a new *tag*
+* existing deployments are still available: users choose which version to use at runtime
+
+---
+
+# Wrapping up
+
+Shout out to **Andreas Fink** and **Theofilos Manitaras** at CSCS.
+
+**Talking point**: What is HPE's road map for the repository?
+* currently packages are missing.
+* it is currently marked as "experimental" and "not for production"
+
+CSCS also uses the RPM repo for uenv deployment
+* it is our position that this is a good step towards modern CPE deployment
+
 
