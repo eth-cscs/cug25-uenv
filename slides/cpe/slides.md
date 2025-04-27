@@ -10,31 +10,72 @@ CUG 2025 PEAD BoF
 
 ---
 
-# CSCS does not deploy CPE
+# CSCS only provides CPE in a container
 
-use containers instead for reasons
+**THE OLD**: install CPE in the base OS image:
+* root access needed to build a new image and reboot
+* modifying the deployment or deploying a new version is a pain in the neck:
+    * **for CSCS**: rebuild, test on a TDS, reboot;
+    * **for users**: reboot downtime, then a changed software environment.
 
-* upgrade independently of system upgrades
-* installation can done by non-admin
-* roll back/roll forward
+**THE NEW** deployment as a container:
+* deployment independent of system upgrade/reboot
+* non-admin CSCS staff (glorified users) can deploy new images
+* roll back and upgrade is trivial
+
+Shout out to Andreas Fink and Theofilos Manitaras at CSCS.
 
 ---
 
-# Step 1: HPE RPM registry
+# HPE RPM repository
+
+HPE provide an RPM repository with RPMs for CPE packages:
+* official releases for 24.7 and 25.3
+* pre-releases of selected packages, e.g. `cray-mpich 9.0`
+
+```
+https://update1.linux.hpe.com/repo/cpe/<CPE-VER>/base/<OS>/<OS-VER>/<ARCH>
+```
+
+Access requires a HPE Passport account and a token
+* [cpe.ext.hpe.com/docs/latest/install/token-authed-repo.html](https://cpe.ext.hpe.com/docs/latest/install/token-authed-repo.html)
+
+CSCS create a proxy repository:
+* for fast local acces
+* to add missing packages
+
+**Talking point**: What is HPE's road map for the repository?
 
 ---
 
-# Step 2: Create a Dockerfile
+# Create a Dockerfile
 
-* One per PrgEnv
-* pre-load modules
+HPE provides examples of CPE DockerFiles: 
+
+CSCS manages DockerFiles in a GitHub repository [eth-cscs/cpe-containers](https://github.com/eth-cscs/cpe-containers).
+
+* A main [DOCKERFILE](https://github.com/eth-cscs/cpe-containers/blob/main/Dockerfile) is specialised for:
+    * CPE version
+    * uarch
+    * PrgEnv
+
+We provide separate containers for each programming environment
+* `cpe-gnu/24.7` and `cpe-gnu/24.7`
+* `cpe-gnu/25.3` with `cray-mpich 9` [will be available](https://github.com/eth-cscs/cpe-containers/pull/4) for the tutorial Monday morning.
 
 ---
 
 # Step 3: Build with CI/CD
 
-* build in k8s
-* ReFrame tests
+We use leverage our "CI/CD Container Build Service" for GitHub to build and test CPE containers
+
+* build logs are [available publicly](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9450233771)
+* ReFrame tests have been adapted to [run in containers](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9435146510).
+* Containers are stored in a self-hosted Container registry at CSCS.
+
+<br>
+
+<img src="./images/pipeline.png" class="h-50" alt="Alt text for the image">
 
 ---
 
