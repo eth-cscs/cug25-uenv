@@ -12,17 +12,6 @@ eth-cscs.github.io/cug25-uenv
 CUG 2025 Tutorial
 
 ---
-
-# uenv on Alps
-
-On Daint, Santis and Clariden CSCS supports two software environments:
-* **uenv**: self-contained application and use-case specific software stacks
-* **container engine**: container runtime with SLURM integration
-
-Daint has the Cray Programming Environment modules (CPE) installed through the `cray` module:
-* provided "as is" -- will be deployed via containers to provide up-to-date versions.
-
----
 layout: two-cols
 layoutClass: gap-2
 ---
@@ -41,6 +30,11 @@ uenv --help
 uenv image --help
 uenv image find --help
 uenv run --help
+```
+
+These slides:
+```
+eth-cscs.github.io/cug25-uenv
 ```
 
 ::right::
@@ -125,9 +119,7 @@ When a uenv is started it does two things:
 
 1. mount a SquashFS file at `/user-environment` or `/user-tools`
     * a directory tree full of files "appears"
-2. set a pre-configured batch of environment variables defined in a _view_.
-
-Everything else about the environment is the same.
+2. apply a **patchset of environment variables** defined in a **view**.
 
 uenv are self-contained:
 * `prgenv-gnu`: compilers, Python, MPI, [CUDA], fftw, hdf5 etc
@@ -161,13 +153,15 @@ uenv commands accept full or partial labels. The following are valid in differen
     <img src="./images/uenv-store.png" class="h-45" alt="Alt text for the image">
 </div>
 
-The **registry** is a server with all of the uenv provided by CSCS.
+The **registry** is a _container registry_ with all of the uenv provided by CSCS.
 * `uenv image find` will list available images: e.g. `uenv image find namd@eiger`
 
 A **repository** is a filesystem folder with uenv that have been downloaded:
 * `uenv image ls` will list pulled images: e.g. `uenv image ls pytorch`
 
-uenv must be pulled to a repository before you can use them.
+<br>
+
+> Note: uenv must be pulled to a repository before you can use them.
 
 ---
 
@@ -177,7 +171,7 @@ Use `uenv image pull` to download a uenv from the registry.
 
 Example: download the latest version of `prgenv-gnu` on Eiger:
 
-```
+```console
 $ uenv image ls prgenv-gnu
 uenv                 arch  system  id                size(MB)  date
 prgenv-gnu/24.11:v1  zen2  eiger   0b6ab5fc4907bb38     572    2024-11-27
@@ -203,7 +197,7 @@ prgenv-gnu/24.11:v2  zen2  eiger   9c9bbe55b6142eab     576    2025-03-31
 
 `uenv run` runs a command with a uenv activated - and returns after it has been run
 
-```
+```bash
 $ which mpicc
 which: no mpicc in (/users/bcumming/.local/x86_64/bin:/usr/local/bin:/usr/bin:/bin:/usr/lpp/mmfs/bin:/usr/lib/mit/bin)
 $ uenv run --view=default prgenv-gnu/24.11:v2 -- which mpicc
@@ -214,7 +208,7 @@ This "wraps" the call with the environment:
 * later calls are not affected by earlier calls
 * compare this to interleaving `module load/swap/unload` between application calls
 
-```
+```bash
 # use a text editor provided by a uenv
 $ uenv run --view=ed editors -- nvim
 # use the python REPL
@@ -229,7 +223,7 @@ $ uenv run --view=default netcdf-tools/2024 -- ncview sst_nmc_daSilva_anoms.66-0
 
 `uenv start` loads a shell with the environment loaded - the following calls are equivalent:
 
-```
+```bash
 uenv run   prgenv-gnu/24.11:v2 --view=default bash
 uenv start prgenv-gnu/24.11:v2 --view=default
 ```
@@ -238,7 +232,7 @@ uenv start prgenv-gnu/24.11:v2 --view=default
 
 Useful for compilation, working in a Python/Julia REPL and exploring uenv -- use `exit` or `<ctrl-d>` to end the session
 
-```
+```bash
 # start the session
 $ uenv start prgenv-gnu/24.11:v2 --view=default
 # do work in the sesssion
@@ -270,12 +264,11 @@ Other recipe specific views create a path with the following structure:
 └── share
 ```
 
-Symlinks link to the software "in the view" to the location where it was installed, and environment variables "point to" the view path, e.g. `PATH=/user-environment/env/default/bin:$PATH`
-```
+Symlinks link to the software in the view to the location where it was installed, and environment variables refer to the view path, e.g. `PATH=/user-environment/env/default/bin:$PATH`
+```bash
 $ realpath /user-environment/env/default/bin/cmake
 /user-environment/linux-sles15-zen2/gcc-13.3.0/cmake-3.30.5-yfndm72rv7msnctkb2nj6hj6k3pn2yi5/bin/cmake
 ```
-
 
 ---
 layout: two-cols
@@ -409,12 +402,7 @@ True
 
 ---
 
-# Demo time: build an application
-
-Build two applications using `prgenv-gnu`:
-
-* easy: [CSCS Affinity](https://github.com/bcumming/affinity)
-* trickier: [MicroHH 2.0](https://microhh.readthedocs.io/en/latest/index.html)
+# CPE Containers
 
 ---
 
@@ -424,10 +412,21 @@ Build two applications using `prgenv-gnu`:
 <br>
 <br>
 
-## Thank you
+# Hands On
 
 <br>
 <br>
 
-## Any questions?
+## time to get hacking
+
+---
+
+# Demo time: build an application
+
+Build two applications using `prgenv-gnu`:
+
+* [CSCS Affinity](https://github.com/bcumming/affinity)
+    * view CPU and GPU affinity in MPI and OpenMP jobs
+* [node burn](https://github.com/eth-cscs/node-burn)
+    * like GPU burn, but can torture CPUs too.
 

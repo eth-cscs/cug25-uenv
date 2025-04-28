@@ -1,11 +1,32 @@
 [](){#ref-tutorial}
 # Tutorial: uenv and CPE Containers on Alps
 
-This tutorial offers a hands-on experience with building and managing software on an HPE Cray system that does not have the CPE installed. 
+This tutorial offers a hands-on experience with building and managing software on an HPE Cray system that does not have the CPE installed.
 
-Specifically, you will be using uenv and a containerized CPE. 
+Specifically, you will be using uenv and a containerized CPE.
 
 You will be given access to NVIDIA Grace Hopper nodes on Alps -- an HPE Cray Supercomputing EX system at CSCS.
+
+## Schedule
+
+| | |
+|---|---|
+| 8:30  | Introduction to uenv and Alps |
+| 9:00  | Logging in to Alps|
+| 9:15  | Hands on |
+| 10:00 | Coffee Break |
+| 11:00 | Hands on |
+| 11:55 | Wrap up |
+| 12:00 | Lunch
+
+
+## Preparation
+
+The aim of the tutorial is for attendees to get "hands on" time with uenv and Grace-Hopper.
+The best way to do this is by working with an application that you are familiar with.
+
+!!! warning "BYO test"
+    attendees are required to bring their own application, benchmark or workflow that they would like to test.
 
 ## Accessing CSCS
 
@@ -38,7 +59,6 @@ The Grace Hopper Superchip (GH200) has:
 
 Each node has approximately 800 GB of total memory, accessible from all sockets. 
 
-
 ### Running Jobs
 
 Daint uses Slurm as the workload manager. Slurm is configured to allocate in full nodes: there is no sharing of nodes. 
@@ -55,7 +75,43 @@ There are a total of 60 nodes available in the reservation. Please do not occupy
 
 ### Filesystems
 
-You have 50 GB available in your `$HOME` directory (`/users/<cscsusername>`). We recommend building your software and running your applications from your `$SCRATCH` directory (`/capstor/scratch/<cscsusername>`), which is a Lustre filesystem.
+You have 50 GB available in your `$HOME` directory (`/users/<cscsusername>`).
+We recommend building your software and running your applications from your `$SCRATCH` directory (`/capstor/scratch/<cscsusername>`), which is a Lustre filesystem.
 
+## Using uenv
 
+Please refer to the CSCS [uenv documentation](https://eth-cscs.github.io/cscs-docs/software/uenv/) for a reference on all of the uenv commands.
 
+To get started, we suggest using the [`prgenv-gnu`](https://eth-cscs.github.io/cscs-docs/software/prgenv/prgenv-gnu/#prgenv-gnu) uenv, which provides cray-mpich, cmake, Python, gcc, cuda, hdf5, netcdf-[c,fortran,c++] and other useful tools:
+
+```bash
+$ uenv image pull prgenv-gnu/24.11:v2
+$ uenv start prgenv-gnu/24.11 --view=default
+# the default view configures PATH and friends:
+$ mpicc --version
+$ cmake --version
+$ echo $CUDA_HOME
+```
+
+uenv that provide programming environments, applications and torch are available:
+
+* [programming environments](https://eth-cscs.github.io/cscs-docs/software/prgenv);
+* [applications](https://eth-cscs.github.io/cscs-docs/software/sciapps/);
+* [ML software](https://eth-cscs.github.io/cscs-docs/software/ml/);
+
+## Using CPE
+
+Please refer to the CSCS [CPE documentation](https://eth-cscs.github.io/cscs-docs/software/prgenv/cpe).
+
+!!! warning
+    As a temporary workaround for a Lustre bug, the following environment variable must be set:
+    ```terminal
+    $ export EDF_PATH=/capstor/scratch/cscs/anfink/shared/cpe/edf:$EDF_PATH
+    ```
+
+To start testing `PrgEnv-gnu`, allocate an interactive session:
+```console
+$ srun -n 1 --reservation=cug --environment=cpe-cray-24.07 --pty bash
+$ module list
+$ module avail
+```

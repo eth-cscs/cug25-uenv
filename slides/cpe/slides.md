@@ -46,9 +46,9 @@ CSCS create a proxy repository:
 
 # Create a Dockerfile
 
-HPE provides examples of CPE Dockerfiles:
+HPE provides examples of CPE Dockerfiles: [cpe.ext.hpe.com](https://cpe.ext.hpe.com/docs/latest/install/installation-guidance-container.html)
 
-CSCS manages Dockerfiles in a GitHub repository [eth-cscs/cpe-containers](https://github.com/eth-cscs/cpe-containers).
+CSCS manages Dockerfiles in a GitHub repository: [eth-cscs/cpe-containers](https://github.com/eth-cscs/cpe-containers).
 
 * A main [DOCKERFILE](https://github.com/eth-cscs/cpe-containers/blob/main/Dockerfile) is specialised for:
     * CPE version
@@ -63,10 +63,10 @@ We provide separate containers for each programming environment
 
 # Build with CI/CD
 
-We leverage our "CI/CD Container Build Service" for GitHub to build and test CPE containers
+We leverage our "CI/CD Container Build Service" for GitHub to build and test CPE containers:
 
-* build logs are [available publicly](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9450233771)
-* ReFrame tests have been adapted to [run in containers](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9435146510).
+* Build logs are [available publicly](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9450233771);
+* ReFrame tests have been adapted to [run in containers](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9435146510);
 * Containers are stored in a self-hosted Container registry at CSCS.
 
 <br>
@@ -89,8 +89,8 @@ srun --environment=cpe-cray/25.3 --pty bash
 * users can further customise what to mount and configure.
 
 What about **rollback**?
-* upgrades and bug fixes are deployed as a new *tag*
-* existing deployments are still available: users choose which version to use at runtime
+* Upgrades and bug fixes are deployed as a new *tag*.
+* Existing deployments are still available; users choose which version to use at runtime.
 
 ---
 
