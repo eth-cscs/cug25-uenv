@@ -7,7 +7,7 @@ theme: ./slidev-theme-cscs
 
 Ben Cumming
 
-bcumming.github.io/cug25-uenv
+eth-cscs.github.io/cug25-uenv
 
 CUG 2025 Tutorial
 
@@ -35,7 +35,7 @@ The up-to-date `uenv` documentation is available on the **new CSCS documentation
 * [scientific application uenv](https://eth-cscs.github.io/cscs-docs/software/sciapps/)
 * [programming environment uenv](https://eth-cscs.github.io/cscs-docs/software/prgenv/)
 
-The uenv command line provides context-sensitve help using the `--help` flag:
+The uenv command line provides context-sensitive help using the `--help` flag:
 ```
 uenv --help
 uenv image --help
@@ -313,7 +313,7 @@ graph TB
 
 # SLURM integration: srun
 
-Use the `--uenv` and `--view` flags with `srun`... the following are eqivalent:
+Use the `--uenv` and `--view` flags with `srun`... the following are equivalent:
 ```
 $ srun -n4 -N1 uenv run prgenv-gnu/24.11 --view=default python3 ./big-job.sh
 $ srun -n4 -N1 --uenv=prgenv-gnu/24.11   --view=default python3 ./big-job.sh
