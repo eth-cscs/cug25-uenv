@@ -27,7 +27,7 @@ CUG 2025 PEAD BoF
 
 # HPE RPM repository
 
-HPE provide an RPM repository with RPMs for CPE packages:
+HPE provides an RPM repository with RPMs for CPE packages:
 * official releases for 24.7 and 25.3
 * pre-releases of selected packages, e.g. `cray-mpich 9.0`
 
@@ -46,9 +46,9 @@ CSCS create a proxy repository:
 
 # Create a Dockerfile
 
-HPE provides examples of CPE DockerFiles: 
+HPE provides examples of CPE Dockerfiles:
 
-CSCS manages DockerFiles in a GitHub repository [eth-cscs/cpe-containers](https://github.com/eth-cscs/cpe-containers).
+CSCS manages Dockerfiles in a GitHub repository [eth-cscs/cpe-containers](https://github.com/eth-cscs/cpe-containers).
 
 * A main [DOCKERFILE](https://github.com/eth-cscs/cpe-containers/blob/main/Dockerfile) is specialised for:
     * CPE version
@@ -57,13 +57,13 @@ CSCS manages DockerFiles in a GitHub repository [eth-cscs/cpe-containers](https:
 
 We provide separate containers for each programming environment
 * `cpe-gnu/24.7` and `cpe-gnu/24.7`
-* `cpe-gnu/25.3` with `cray-mpich 9` [will be available](https://github.com/eth-cscs/cpe-containers/pull/4) for the tutorial Monday morning.
+* `cpe-gnu/25.3` with `cray-mpich-8.1.32 (default) and a `cray-mpich-9.0.0` module [will be available](https://github.com/eth-cscs/cpe-containers/pull/4) for the tutorial Monday morning.
 
 ---
 
 # Build with CI/CD
 
-We use leverage our "CI/CD Container Build Service" for GitHub to build and test CPE containers
+We leverage our "CI/CD Container Build Service" for GitHub to build and test CPE containers
 
 * build logs are [available publicly](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9450233771)
 * ReFrame tests have been adapted to [run in containers](https://gitlab.com/cscs-ci/ci-testing/webhook-ci/mirrors/2669120559805972/3219555857501655/-/jobs/9435146510).
@@ -81,6 +81,7 @@ Download and store the images on a shared filesystem and configured for all user
 
 **EXAMPLE** to start an interactive session
 ```
+export EDF_PATH=/capstor/scratch/cscs/anfink/shared/cpe/edf:$EDF_PATH
 srun --environment=cpe-cray/25.3 --pty bash
 ```
 
@@ -98,7 +99,7 @@ What about **rollback**?
 Shout out to **Andreas Fink** and **Theofilos Manitaras** at CSCS.
 
 **Talking point**: What is HPE's road map for the repository?
-* currently packages are missing.
+* currently packages are missing (examples: libpals CPE-25.03-aarch64, libxpmem CPE-24.07-x86_64)
 * it is currently marked as "experimental" and "not for production"
 
 CSCS also uses the RPM repo for uenv deployment
