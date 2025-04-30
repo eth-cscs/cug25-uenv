@@ -12,21 +12,31 @@ You will be given access to NVIDIA Grace Hopper nodes on Alps -- an HPE Cray Sup
 | | |
 |---|---|
 | 8:30  | Introduction to uenv and Alps |
-| 9:00  | Logging in to Alps|
-| 9:15  | Hands on |
-| 10:00 | Coffee Break |
-| 11:00 | Hands on |
-| 11:55 | Wrap up |
-| 12:00 | Lunch
+| 9:00  | Logging in to Alps            |
+| 9:15  | Hands on      |
+| 10:00 | Coffee Break  |
+| 10:30 | Hands on      |
+| 11:55 | Wrap up       |
+| 12:00 | Lunch         |
 
 
 ## Preparation
 
 The aim of the tutorial is for attendees to get "hands on" time with uenv and Grace-Hopper.
-The best way to do this is by working with an application that you are familiar with.
 
-!!! warning "BYO test"
-    attendees are required to bring their own application, benchmark or workflow that they would like to test.
+!!! tip "BYO test"
+    The best way to do this is by working with an application that you are familiar with.
+
+    Attendees are encouraged to bring a use case that you would like to build and run using uenv.
+
+    * if you don't have an application, we can team you up with somebody who has a use case that interests you
+    * use cases can be applications, benchmarks, workflows or building your own uenv.
+
+!!! note "give us a heads up"
+    Let us know beforehand about your code and workflow, so that we can prepare.
+
+    * on the [CUG slack](https://crayusers.slack.com)
+    * email Ben Cumming: `bcumming@cscs.ch`
 
 ## Accessing CSCS
 
