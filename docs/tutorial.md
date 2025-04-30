@@ -22,12 +22,12 @@ You will be given access to NVIDIA Grace Hopper nodes on Alps -- an HPE Cray Sup
 
 ## Preparation
 
-The aim of the tutorial is for attendees to get "hands on" time with uenv and Grace-Hopper.
+The aim of the tutorial is for attendees to get "hands on" time with uenv and Grace Hopper.
 
 !!! tip "BYO test"
     The best way to do this is by working with an application that you are familiar with.
 
-    Attendees are encouraged to bring a use case that you would like to build and run using uenv.
+    You are encouraged to bring a use case that you'd like to build and run using uenv.
 
     * if you don't have an application, we can team you up with somebody who has a use case that interests you
     * use cases can be applications, benchmarks, workflows or building your own uenv.
@@ -35,7 +35,7 @@ The aim of the tutorial is for attendees to get "hands on" time with uenv and Gr
 !!! note "give us a heads up"
     Let us know beforehand about your code and workflow, so that we can prepare.
 
-    * on the [CUG slack](https://crayusers.slack.com)
+    * on the [CUG slack](https://crayusers.slack.com), join the channel `#cug2025-tutorial-1b`.
     * email Ben Cumming: `bcumming@cscs.ch`
 
 ## Accessing CSCS
