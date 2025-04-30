@@ -490,27 +490,7 @@ CSCS hosts MCH on Alps:
 
 ---
 
-# uenv use cases
-
-* mch
-* jupyter
-
----
-
-# uenv build service
-
-These components can be mixed and matched
-
-`uenv build recipe target`
-
-deploys to `service::`
-
-* communities using to build their own
-* cscs staff building one-off
-
----
-
-# reflection
+# Reflection
 
 * work expands to fill capacity: pipelines mean we deploy more software
 * community provides more software
@@ -519,17 +499,18 @@ deploys to `service::`
 
 ---
 
-# future work
+# Future work
 
 * Spack 1.0
 * xxx
 
+All tools, workflows, etc are in public GitHub repositories
+- varying levels of site-specificity
+
+
 ---
 
 # Questions
-
-All tools, workflows, etc are in public GitHub repositories
-- varying levels of site-specificity
 
 Grab a coffee and chat with us outside
 
@@ -553,4 +534,24 @@ CSCS hosts MCH on Alps:
 
 **AIM** How can C2SM become more resiliant, and take control of providing support?
 **AIM** How can MCH take more control of their pro
+
+---
+
+# uenv build service
+
+These components can be mixed and matched
+
+`uenv build recipe target`
+
+deploys to `service::`
+
+* communities using to build their own
+* cscs staff building one-off
+
+---
+
+# uenv use cases
+
+* mch
+* jupyter
 
