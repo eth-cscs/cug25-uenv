@@ -49,7 +49,7 @@ How CSCS provides software had to change.
 layout: two-cols-header
 ---
 
-# Multi-tenancy vs. Software Deployment
+# Multi-Tenant Software Deployment
 
 :: left ::
 
@@ -74,7 +74,6 @@ layout: two-cols-header
 </div>
 
 <!--
-
 Here is an overview of the workflow for deploying software that we use
 
 We will cover each component in this presentation.
@@ -90,11 +89,13 @@ We will cover each component in this presentation.
 layout: two-cols-header
 ---
 
-# software = environments + runtime
+# environments  = software + runtime
 
-Centers provide both pre-built software and the means to use it to our users.
+## **We provide both pre-built software and the means to use it**
 
 ::left::
+
+<div v-click>
 
 ### **software** is built or downloaded.
 
@@ -109,7 +110,11 @@ Download **containers**:
 
 From the **[EESSI](https://www.eessi.io/)** repository
 
+</div>
+
 ::right::
+
+<div v-click class="text-x1">
 
 ### A **runtime** serves the software.
 
@@ -125,78 +130,129 @@ provide a **container** runtime:
 
 CernVM-FS for **[EESSI](https://www.eessi.io/docs/filesystem_layer/)**: virtual network file system
 
+</div>
+
 ---
 layout: two-cols
 ---
 
-# Stackinator
+# Building Software Stacks
 
-CSCS solution: stackinator
+[Stackinator](https://eth-cscs.github.io/stackinator/) (CUG 2023) is a configuration tool for isolated software stacks
 
-recipe➡️  stackinator➡️  Makefile➡️  Spack➡️  squashfs
+<div v-click>
 
-* cray-mpich package from RPMS
-* libfabric, cxi, cassini, OpenMPI, aws-ofi-nccl, nccl
-* spack versioned per recipe
+```
+stackinator(recipe,cluster)➡️ Makefile➡️ Spack➡️ SquashFS
+```
+
+* Each software stack is a yaml _recipe_;
+* Clusters are described in yaml files;
+* Minimal dependencies on the base OS (libfabric).
+
+Uses Spack and packages with SS11 optimizations:
+* The Spack version is set in the recipe;
+* Repackaged vendored software, e.g. `cray-mpich`.
+
+The SquashFS images are **self-contained** and **independent**
+
+</div>
 
 ::right::
 
+<div v-click class="text-x1">
+
 ```yaml
-icon:
+gcc-env:
   compiler:
       - toolchain: gcc
         spec: gcc
-      - toolchain: llvm
-        spec: nvhpc
   mpi:
-      spec: cray-mpich@8.1.30%nvhpc
+      spec: cray-mpich@8.1.30
       gpu: cuda
   unify: true
   specs:
-  - boost ~mpi
-  - python@3.10
+  - boost +chrono +filesystem +iostreams +mpi +python
+  - fftw
+  - gsl
+  - netcdf-c
+  - openblas threads=openmp
+  - python@3.12
   - cuda@12.6
-  - eccodes@2.36.4%nvhpc +tools +fortran +aec +openmp jp2k=jasper
-  - cosmo-eccodes-definitions@2.36.0.3
-  - hdf5%nvhpc +szip +hl +fortran +mpi
-  - netcdf-fortran@4.6.1%nvhpc
-  - openblas
   variants:
   - +mpi
   - +cuda
   - cuda_arch=90
+  views:
+    default:
+      link: roots
+      uenv:
+        add_compilers: true
+        prefix_paths:
+          LD_LIBRARY_PATH: [lib, lib64]
 ```
+
+</div>
+
+<!--
+
+* we skip over this quickly because it has been presented previously.
+* we have made improvements and extensions, but nothing radical.
+
+* versioning Spack per-image is important: we don't want a while workflow that depends on a specific version of Spack that then becomes painful to upgrade
+-->
 
 ---
 
 # uenv runtime
 
-The uenv runtime is the interface for SquashFS images
+The uenv runtime is a CLI tool and SLURM plugin for mounting SquashFS and configuring the environment.
 
-* command line tool (CLI)
-* slurm plugin
+**Open source:** [github.com/eth-cscs/uenv2](https://github.com/eth-cscs/uenv2)
+<br>
 
-C++ with a common library
+<div v-click>
 
-Installed via RPMs
+**Why is it called uenv2?**
+* The first version was written in Python, then we rewrote it in C++.
+* You could also modify the environment with a command similar to `module load`.
 
-* oras
-* curl
-* sqlite3
+</div v-click>
+
+<br>
+
+<div v-click class="text-x1">
+
+**Why did you change?**
+* let's take that offline.
+
+<div class="flex justify-center">
+    <img src="./images/harmen.png" class="h-20" alt="maybe the authors opinion">
+</div>
+
+</div>
 
 ---
 
-# uenv image management
+# uenv Image Management
 
 <div class="flex justify-center">
     <img src="./images/uenv-store.png" class="h-45" alt="Alt text for the image">
 </div>
 
-The **registry** is a _container registry_ with all of the uenv provided by CSCS.
+<div v-click>
+
+The **registry** is a _container registry_ with all of the uenv provided by CSCS:
 * `uenv image find` will list available images: e.g. `uenv image find namd@eiger`
+
+</div>
+
+<div v-click class="text-x1">
 
 A **repository** is a filesystem folder with uenv that have been downloaded:
 * `uenv image ls` will list pulled images: e.g. `uenv image ls pytorch`
+
+</div>
 
 <br>
 
@@ -206,9 +262,9 @@ layout: two-cols-header
 
 # using uenv on the command line
 
-The uenv command line tool (CLI)
-
 ::left::
+
+<div v-click>
 
 ### `uenv run`: runs a command
 
@@ -229,7 +285,11 @@ $ uenv run --view=default netcdf-tools/2024 -- \
 
 **For use in scripts**
 
+</div v-click>
+
 ::right::
+
+<div v-click class="text-x1">
 
 ### `uenv start`: starts a shell
 
@@ -252,9 +312,11 @@ $ exit
 
 **For interactive use only**
 
+</div>
+
 ---
 
-# uenv views apply environment variable patches
+# uenv Views Apply Environment Variable Patches
 
 The `modules` and `spack` views are generated automatically:
 * `modules` provides [modules of packages](https://eth-cscs.github.io/cscs-docs/software/uenv/#modules);
@@ -289,9 +351,15 @@ On Alps the uenv SLURM plugin configures uenv on the compute nodes of jobs.
 Spank plugin implements `--uenv` and `--view` flags:
 * **login node**: Check the parameters, find the SquashFS image and set environment variables
     * fail early
-* **compute**: mount the SquashFS image before forking the MPI ranks on the node
+* **compute**: mount the SquashFS image before forking the MPI ranks: the SquashFS mounted once per node.
 
-The SquashFS image is mounted once per node.
+```console
+$ srun -n4 -N1 --uenv=prgenv-gnu/24.11:v2  --view=default
+    python3 ./job.py
+# compute nodes inherit login env: this is equivalent
+$ uenv start prgenv-gnu/24.11:v2 --view=default
+$ srun -n4 -N1 python3 ./job.py
+```
 
 ::right::
 
@@ -310,34 +378,16 @@ graph TB
 ```
 
 ---
-
-# SLURM integration: srun
-
-Use the `--uenv` and `--view` flags with `srun`... the following are equivalent:
-```
-$ srun -n4 -N1 uenv run prgenv-gnu/24.11 --view=default python3 ./big-job.sh
-$ srun -n4 -N1 --uenv=prgenv-gnu/24.11   --view=default python3 ./big-job.sh
-```
-
-Using the SLURM plugin is more efficient:
-* SquashFS is mounted only once per node;
-* and it fails immediately without using resources if there is an invalid parameter.
-
-SLURM detects and uses the calling uenv environment on compute nodes (just like modules)
-```
-$ uenv start prgenv-gnu/24.11:v2 --view=default
-$ srun -n128 -N32 --gpus-per-task=1 python3 ./runner.py
-```
-
----
 layout: two-cols-header
 ---
 
 # Registry: artifact management
 
-**How to manage SquashFs images over multiple clusters (with different storage mounted)?**
+**How to provide SquashFs images over multiple clusters (with different storage mounted)?**
 
 ::left::
+
+<div v-click>
 
 <div class="flex items-center gap-0">
   <h3 class="font-normal">OCI Registry</h3>
@@ -356,7 +406,11 @@ Images are stored as follows:
 * restrictions with patterns: `*/*/*/vasp/*`
 * pipeline and staff have write permission
 
+</div>
+
 ::right::
+
+<div v-click class="text-x1">
 
 <div class="flex items-center gap-0">
   <h3 class="font-normal">ORAS</h3>
@@ -380,6 +434,7 @@ $ oras discover $address --artifact-type uenv/meta
 $ oras pull $address
     --output $repo/images/$hash/store.squashfs
 ```
+</div>
 
 ---
 
@@ -512,7 +567,17 @@ All tools, workflows, etc are in public GitHub repositories
 
 # Questions
 
-Grab a coffee and chat with us outside
+<br>
+
+Ask now if we have time
+
+<br>
+
+or...
+
+<br>
+
+Grab a coffee and chat outside later
 
 
 ---
