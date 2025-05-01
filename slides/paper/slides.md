@@ -474,25 +474,21 @@ CSCS has developed a CI/CD external Service
 * infrastructure for running pipelines on site
 * trigger builds (CSCS staff can trigger)
 
--->
+t-->
 
 ---
 
-# recipe repo
+# Recipe repo and CI/CD Project
 
-The `ethc-cscs/alps-uenv` repository
-- structure
-- config
+<div class="flex justify-center">
+    <img src="./images/ci-global.png" class="w-160 shadow-xl" alt="comment on uenv pr">
+</div>
 
----
+<br>
 
-# CI/CD project
-
-Screenshot of project page and talk to the following
-
-* permission to push to build namespace for all vClusters
-* whitelist CSCS staff
-* ci.yaml that configures uenv-specific pipelines
+<div class="flex justify-center">
+    <img src="./images/ci-pipeline.png" class="w-160 shadow-xl" alt="comment on uenv pr">
+</div>
 
 ---
 
@@ -503,22 +499,60 @@ Screenshot of project page and talk to the following
 * generate pipeline from template
 * runs build (s8r) and test (ReFrame)
 
+
+<div class="flex justify-center">
+    <img src="./images/pr-comment.png" class="h-30 shadow-xl" alt="comment on uenv pr">
+</div>
+
+---
+layout: two-cols-header
 ---
 
-# ReFrame testing
+# ReFrame Testing
 
-* show `refame.yaml` and talk to how it works
+### **uenv need to be tested when they are built and daily to check for regressions.**
 
----
+::left::
 
-# Deployment
+ReFrame tests configured in the recipe:
+* environments that exhibit testable *features*
+* how to configure each environment
 
-Manual copy from build to deploy namespace
+**If present the pipeline runs the tests.**
 
-* `uenv image find build::cp2k`
-* `uenv image pull build::cp2k`
-* `uenv image copy build::cp2k deploy::cp2k`
-* `uenv image find cp2k`
+**Nightly testing:**
+* `uenv find` to list all uenv on the system
+* `uenv pull --only-meta`: check meta data
+* run reframe tests
+
+**The reframe tests are described in a central repository**
+
+::right::
+
+<div v-click>
+
+For example, the [NAMD](https://github.com/eth-cscs/alps-uenv/blob/main/recipes/namd/3.0/gh200/extra/reframe.yaml) configuration:
+
+```yaml
+develop:
+  features:
+    - cuda
+    - namd-single-node-dev
+  views:
+    - develop-single-node
+run:
+  features:
+    - cuda
+    - namd-single-node
+  views:
+    - namd-single-node
+```
+
+Provides two environments:
+1. `develop` everything needed to build NAMD
+1. `run` provides pre-built NAMD
+
+</div>
 
 ---
 
@@ -619,4 +653,15 @@ deploys to `service::`
 
 * mch
 * jupyter
+
+---
+
+# Deployment
+
+Manual copy from build to deploy namespace
+
+* `uenv image find build::cp2k`
+* `uenv image pull build::cp2k`
+* `uenv image copy build::cp2k deploy::cp2k`
+* `uenv image find cp2k`
 
