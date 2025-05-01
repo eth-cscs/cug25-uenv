@@ -60,9 +60,13 @@ layout: two-cols-header
 
 :: right ::
 
+<div v-click>
+
 **After**: Six (and growing) systems
 <div class="flex justify-center">
     <img src="./images/new-model.png" class="h-90" alt="uenv deployment overview">
+</div>
+
 </div>
 
 ---
