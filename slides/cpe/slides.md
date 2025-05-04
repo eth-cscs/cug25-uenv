@@ -101,7 +101,7 @@ What about **rollback**?
 * Upgrades and bug fixes are deployed as a new *tag*.
 * Existing deployments are still available; users choose which version to use at runtime.
 
-<div v-click>
+</div>
 
 ---
 
