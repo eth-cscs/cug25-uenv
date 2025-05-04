@@ -10,7 +10,9 @@ CUG 2025 PEAD BoF
 
 ---
 
-# CSCS only provides CPE in a container
+# CSCS **will** only provide CPE in a container
+
+<br>
 
 **THE OLD**: install CPE in the base OS image:
 * root access needed to build a new image and reboot
@@ -18,10 +20,16 @@ CUG 2025 PEAD BoF
     * **for CSCS**: rebuild, test on a TDS, reboot;
     * **for users**: reboot downtime, then a changed software environment.
 
+<div v-click>
+
+<br>
+
 **THE NEW** deployment as a container:
 * deployment independent of system upgrade/reboot
 * non-admin CSCS staff (glorified users) can deploy new images
 * roll back and upgrade is trivial
+
+</div>
 
 ---
 
@@ -81,16 +89,19 @@ Download and store the images on a shared filesystem and configured for all user
 
 **EXAMPLE** to start an interactive session
 ```
-export EDF_PATH=/capstor/scratch/cscs/anfink/shared/cpe/edf:$EDF_PATH
 srun --environment=cpe-cray/25.3 --pty bash
 ```
 
 * the scratch filesystem is mounted automatically inside the container;
 * users can further customise what to mount and configure.
 
+<div v-click>
+
 What about **rollback**?
 * Upgrades and bug fixes are deployed as a new *tag*.
 * Existing deployments are still available; users choose which version to use at runtime.
+
+<div v-click>
 
 ---
 
@@ -102,7 +113,8 @@ Shout out to **Andreas Fink** and **Theofilos Manitaras** at CSCS.
 * currently packages are missing (examples: libpals CPE-25.03-aarch64, libxpmem CPE-24.07-x86_64)
 * it is currently marked as "experimental" and "not for production"
 
-CSCS also uses the RPM repo for uenv deployment
-* it is our position that this is a good step towards modern CPE deployment
+CSCS also uses the RPM repo for uenv deployment:
+* we are intested in HPE's plans for supporting it
+* it is a step in the right direction for more flexible methods for providing CPE software.
 
 

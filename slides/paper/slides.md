@@ -633,7 +633,6 @@ CSCS hosts MCH on Alps:
 All tools, workflows, etc are in public GitHub repositories
 - varying levels of site-specificity
 
-
 ---
 
 # Questions
