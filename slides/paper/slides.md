@@ -495,18 +495,41 @@ t-->
 </div>
 
 ---
+layout: two-cols-header
+---
 
 # uenv-pipeline
 
-`eth-cscs/uenv-pipeline`
+::left::
+
+The pipeline is maintained in a
+GitHub repository: [`eth-cscs/uenv-pipeline`](https://github.com/eth-cscs/uenv-pipeline)
 
 * generate pipeline from template
-* runs build (s8r) and test (ReFrame)
+* build and test phase implementation
+* image management
 
+::right::
+
+Used by multiple services:
+* `uenv build` command
+* CI/CD external "uenv service"
+* community-maintained repositories (more later)
+
+::bottom::
+
+<br>
+<br>
+<br>
+
+<div class="flex justify-center">
+Triggered by comments on GitHub PRs.
+</div>
 
 <div class="flex justify-center">
     <img src="./images/pr-comment.png" class="h-30 shadow-xl" alt="comment on uenv pr">
 </div>
+
 
 ---
 layout: two-cols-header
@@ -583,12 +606,22 @@ CSCS hosts MCH on Alps:
 
 ---
 
-# Reflection
+# Is it Worth It?
 
-* work expands to fill capacity: pipelines mean we deploy more software
-* community provides more software
-    * acceptance of new approach (uenv) was easier than I feared
-* empowering staff empowers users
+** The good **
+
+* Has it reduced workload?
+    * Total effort has not decreased. Deployed software has increased significantly.
+* Empowering staff empowers users:
+    * Communities are providing complete software stacks software (e.g. C2SM)
+    * Users accepted uenv with little fuss (I was surprised)
+* Over two years old software stacks are still working.
+
+** The bad **
+
+* The `(cluster-config X Spack X stackinator)` matrix requires careful management
+* Development of Stackinator and uenv had a high up-front cost
+    * (approx 1 person full time for 2 years)
 
 ---
 
