@@ -111,7 +111,9 @@ uenv that provide programming environments, applications and torch are available
 
 ## Using CPE
 
-Please refer to the CSCS [CPE documentation](https://eth-cscs.github.io/cscs-docs/software/prgenv/cpe).
+Please refer to the CSCS:
+* [CPE documentation](https://eth-cscs.github.io/cscs-docs/software/prgenv/cpe).
+* [Container engine documentation](https://eth-cscs.github.io/cscs-docs/software/container-engine).
 
 !!! warning
     As a temporary workaround for a Lustre bug, the following environment variable must be set:

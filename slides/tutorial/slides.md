@@ -404,6 +404,13 @@ True
 
 # CPE Containers
 
+The CPE containers are "work in progress".
+
+* [CPE documentation](https://eth-cscs.github.io/cscs-docs/software/prgenv/cpe).
+* [Container engine documentation](https://eth-cscs.github.io/cscs-docs/software/container-engine).
+
+Ask Alberto if you have any questions about CSCS' container solution.
+
 ---
 
 <br>
