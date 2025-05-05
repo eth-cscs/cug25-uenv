@@ -45,6 +45,11 @@ How CSCS provides software had to change.
     <img src="./images/alps-blah.png" class="h-60" alt="alps on the floor">
 </div>
 
+
+<!--
+no notes
+-->
+
 ---
 layout: two-cols-header
 ---
@@ -69,6 +74,22 @@ layout: two-cols-header
 
 </div>
 
+<!--
+Alps replaced our old Cray XC system Daint:
+- a single cluster with MC and GPU partitions
+- Separate teams that install software and support users
+    - CPE installed by system admins
+    - Other software installed by "normal user" staff who support users
+
+The Alps model moves towards separte clusters for communities
+- Support is distributed across teams
+- The old model won't scale: teams need
+    - e2e ability to install, upgrade, downgrade, deploy software stacks without root permission
+
+"agile" and "independent" sw deployment: can we get user communities involved?
+-->
+
+
 ---
 
 # Alps Software Deployment
@@ -86,6 +107,7 @@ We will cover each component in this presentation.
 * sw + runtime
 * registry
 * pipeline
+
 -->
 
 
@@ -95,7 +117,7 @@ layout: two-cols-header
 
 # environments  = software + runtime
 
-## **We provide both pre-built software and the means to use it**
+## **Centers provide pre-built software and the means to use it**
 
 ::left::
 
@@ -135,6 +157,21 @@ provide a **container** runtime:
 CernVM-FS for **[EESSI](https://www.eessi.io/docs/filesystem_layer/)**: virtual network file system
 
 </div>
+
+<!--
+We are in the business of providing software
+
+We have to decide how to build software and how users will load and use it.
+
+A very common approach: compile and install software on shared filesystem and provide modules.
+- the runtime is module command (pure modification of env variables)
+
+Other options exist: e.g. containers
+- you have to build the container and "install it somewhere"
+- and provide a container runtime
+- the question with containers is "how do we build the containers?"
+
+-->
 
 ---
 layout: two-cols
@@ -200,8 +237,16 @@ gcc-env:
 
 <!--
 
+To build software stacks CSCS developed stackinator
+
 * we skip over this quickly because it has been presented previously.
-* we have made improvements and extensions, but nothing radical.
+
+Stackinator formalises a Spack-based workflow for installing software stacks
+- use librabric from system -> compilers -> software packages
+- sw stack is bundled into a squashfs file
+- each version is a single artifact
+
+* cray-mpich
 
 * versioning Spack per-image is important: we don't want a while workflow that depends on a specific version of Spack that then becomes painful to upgrade
 -->
@@ -230,9 +275,6 @@ The uenv runtime is a CLI tool and SLURM plugin for mounting SquashFS and config
 **Why did you change?**
 * let's take that offline.
 
-<div class="flex justify-center">
-    <img src="./images/harmen.png" class="h-20" alt="maybe the authors opinion">
-</div>
 
 </div>
 
@@ -608,16 +650,16 @@ CSCS hosts MCH on Alps:
 
 # Is it Worth It?
 
-** The good **
+**The good**
 
 * Has it reduced workload?
     * Total effort has not decreased. Deployed software has increased significantly.
 * Empowering staff empowers users:
     * Communities are providing complete software stacks software (e.g. C2SM)
-    * Users accepted uenv with little fuss (I was surprised)
+    * Users accepted uenv with little fuss (to my surprise)
 * Over two years old software stacks are still working.
 
-** The bad **
+**The bad**
 
 * The `(cluster-config X Spack X stackinator)` matrix requires careful management
 * Development of Stackinator and uenv had a high up-front cost
@@ -628,10 +670,10 @@ CSCS hosts MCH on Alps:
 # Future work
 
 * Spack 1.0
-* xxx
-
-All tools, workflows, etc are in public GitHub repositories
-- varying levels of site-specificity
+* Maintenance
+* Support at other sites?
+    * All tools and workflows are in public GitHub repositories
+    * varying levels of site-specificity
 
 ---
 
@@ -648,7 +690,6 @@ or...
 <br>
 
 Grab a coffee and chat outside later
-
 
 ---
 
@@ -701,3 +742,6 @@ Manual copy from build to deploy namespace
 * `uenv image copy build::cp2k deploy::cp2k`
 * `uenv image find cp2k`
 
+<div class="flex justify-center">
+    <img src="./images/harmen.png" class="h-20" alt="maybe the authors opinion">
+</div>
