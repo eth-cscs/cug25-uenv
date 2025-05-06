@@ -492,7 +492,7 @@ t-->
 
 ---
 
-# CI/CD Project For the Project
+# CI/CD Project For the Recipes
 
 <div class="flex justify-center">
     <img src="./images/ci-global.png" class="w-160 shadow-xl" alt="comment on uenv pr">
@@ -556,11 +556,11 @@ layout: two-cols-header
 
 # ReFrame Testing
 
-### **uenv are tested after builing, and daily for regressions.**
+### **uenv are tested after building, and daily for regressions.**
 
 ::left::
 
-ReFrame tests configured in the recipe:
+An optional `reframe.yaml` file  in the recipe:
 * environments that exhibit testable *features*
 * how to configure each environment
 
