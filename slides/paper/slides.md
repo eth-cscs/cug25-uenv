@@ -11,6 +11,8 @@ ETH Zurich - Swiss National Supercomputing Center (CSCS)
 
 CUG 2025
 
+[`eth-cscs.github.io/cug25-uenv`](https://eth-cscs.github.io/cug25-uenv/)
+
 ---
 layout: two-cols
 layoutClass: gap-2
@@ -31,8 +33,6 @@ Alps is a HPE Cray EX system with ~4000 nodes.
 
 <br>
 
-How CSCS provides software had to change.
-
 ::right::
 
 <br>
@@ -47,14 +47,21 @@ How CSCS provides software had to change.
 
 
 <!--
-no notes
+Alps is a HPE Cray EX system with 4,000 nodes
+* started installation in 2020 with multi-core zen2 nodes
+* installed in phases
+* the largest phase of >10,000 GH200 was installed last year
+
+Differentiating feature is that Alps is partitioned into isolated clusters instead of a monolith with partitions
+* each cluster is customised for community or use case: independent slurm, different storage, different software environments
+* by providing per-customer systems we aim to also have the communities take more responsibility for the software stacks
 -->
 
 ---
 layout: two-cols-header
 ---
 
-# Multi-Tenant Software Deployment
+# Multi-Tenant Software Support Model
 
 :: left ::
 
@@ -80,9 +87,9 @@ Alps replaced our old Cray XC system Daint:
 - Separate teams that install software and support users
     - CPE installed by system admins
     - Other software installed by "normal user" staff who support users
+    - this same team also provided most of the user support
 
-The Alps model moves towards separte clusters for communities
-- Support is distributed across teams
+The Alps model sees support distributed across teams
 - The old model won't scale: teams need
     - e2e ability to install, upgrade, downgrade, deploy software stacks without root permission
 
@@ -107,69 +114,6 @@ We will cover each component in this presentation.
 * sw + runtime
 * registry
 * pipeline
-
--->
-
-
----
-layout: two-cols-header
----
-
-# environments  = software + runtime
-
-## **Centers provide pre-built software and the means to use it**
-
-::left::
-
-<div v-click>
-
-### **software** is built or downloaded.
-
-Scripts + Spack/Easybuild + **modules** on filesystem:
-- Pawsey on Setonix
-- CSCS on Daint-XC
-- E4S using Spack
-
-Download **containers**:
-- NVIDIA NGC
-- E4S containers
-
-From the **[EESSI](https://www.eessi.io/)** repository
-
-</div>
-
-::right::
-
-<div v-click class="text-x1">
-
-### A **runtime** serves the software.
-
-install a **modules** implementation:
-* TCL modules
-* Lmod
-
-<br>
-
-provide a **container** runtime:
-* Podman/Apptainer/Sarus
-* pyxis+enroot
-
-CernVM-FS for **[EESSI](https://www.eessi.io/docs/filesystem_layer/)**: virtual network file system
-
-</div>
-
-<!--
-We are in the business of providing software
-
-We have to decide how to build software and how users will load and use it.
-
-A very common approach: compile and install software on shared filesystem and provide modules.
-- the runtime is module command (pure modification of env variables)
-
-Other options exist: e.g. containers
-- you have to build the container and "install it somewhere"
-- and provide a container runtime
-- the question with containers is "how do we build the containers?"
 
 -->
 
@@ -247,8 +191,6 @@ Stackinator formalises a Spack-based workflow for installing software stacks
 - each version is a single artifact
 
 * cray-mpich
-
-* versioning Spack per-image is important: we don't want a while workflow that depends on a specific version of Spack that then becomes painful to upgrade
 -->
 
 ---
@@ -257,14 +199,13 @@ Stackinator formalises a Spack-based workflow for installing software stacks
 
 The uenv runtime is a CLI tool and SLURM plugin for mounting SquashFS and configuring the environment.
 
-**Open source:** [github.com/eth-cscs/uenv2](https://github.com/eth-cscs/uenv2)
-<br>
-
 <div v-click>
 
-**Why is it called uenv2?**
-* The first version was written in Python, then we rewrote it in C++.
-* You could also modify the environment with a command similar to `module load`.
+**Open source:** [github.com/eth-cscs/uenv2](https://github.com/eth-cscs/uenv2)
+* CLI is a statically linked binary
+* SLURM plugin and CLI share a common implementation
+* RPMs for x86 and aarch64 are built by CI
+* CSCS would be happy to help you try it out
 
 </div v-click>
 
@@ -272,35 +213,11 @@ The uenv runtime is a CLI tool and SLURM plugin for mounting SquashFS and config
 
 <div v-click class="text-x1">
 
-**Why did you change?**
-* let's take that offline.
-
-
-</div>
-
----
-
-# uenv Image Management
-
-<div class="flex justify-center">
-    <img src="./images/uenv-store.png" class="h-45" alt="Alt text for the image">
-</div>
-
-<div v-click>
-
-The **registry** is a _container registry_ with all of the uenv provided by CSCS:
-* `uenv image find` will list available images: e.g. `uenv image find namd@eiger`
+**Why is it called uenv2?**
+* The first version was written in Python, then we rewrote it in C++.
+* You could also modify the environment with a command similar to `module load`.
 
 </div>
-
-<div v-click class="text-x1">
-
-A **repository** is a filesystem folder with uenv that have been downloaded:
-* `uenv image ls` will list pulled images: e.g. `uenv image ls pytorch`
-
-</div>
-
-<br>
 
 ---
 layout: two-cols-header
@@ -360,6 +277,10 @@ $ exit
 
 </div>
 
+<!--
+NOTES
+-->
+
 ---
 
 # uenv Views Apply Environment Variable Patches
@@ -384,6 +305,10 @@ Symlinks link to the software in the view to the location where it was installed
 $ realpath /user-environment/env/default/bin/cmake
 /user-environment/linux-sles15-zen2/gcc-13.3.0/cmake-3.30.5-yfndm72rv7msnctkb2nj6hj6k3pn2yi5/bin/cmake
 ```
+
+<!--
+NOTES
+-->
 
 ---
 layout: two-cols
@@ -422,6 +347,10 @@ graph TB
     D --> G[rank n-1]
     end
 ```
+
+<!--
+NOTES
+-->
 
 ---
 layout: two-cols-header
@@ -482,6 +411,41 @@ $ oras pull $address
 ```
 </div>
 
+
+<!--
+NOTES
+-->
+
+---
+
+# uenv Image Management for Users
+
+<div class="flex justify-center">
+    <img src="./images/uenv-store.png" class="h-45" alt="Alt text for the image">
+</div>
+
+<div v-click>
+
+The **registry** is the _container registry_ with all of the uenv provided by CSCS:
+* `uenv image find` will list available images: e.g. `uenv image find namd@eiger`
+
+</div>
+
+<div v-click class="text-x1">
+
+A **repository** is a filesystem folder with uenv that have been downloaded:
+* `uenv image ls` will list pulled images: e.g. `uenv image ls pytorch`
+
+</div>
+
+<br>
+
+
+<!--
+NOTES
+-->
+
+
 ---
 
 # Deployment and uenv Management
@@ -491,13 +455,17 @@ $ oras pull $address
 </div>
 
 <!--
-## NEEDS
+We have covered how users interact with and download images.
+
+Next we will cover how CSCS builds images provided to users in the registry.
+
+We use a GitOps workflow, which requires
 - infrastructure for running pipelines on site
 - manage recipes (CSCS staff can create/modify)
 - trigger builds (CSCS staff can trigger)
-- build (stackinator on target node)
-- store in registry
-- test (reframe on target cluster)
+- impl of build (stackinator on target node)
+- impl of test (reframe on target cluster)
+- orchestrate buil build and test jobs
 -->
 
 ---
@@ -524,7 +492,7 @@ t-->
 
 ---
 
-# Recipe repo and CI/CD Project
+# CI/CD Project For the Project
 
 <div class="flex justify-center">
     <img src="./images/ci-global.png" class="w-160 shadow-xl" alt="comment on uenv pr">
@@ -536,6 +504,11 @@ t-->
     <img src="./images/ci-pipeline.png" class="w-160 shadow-xl" alt="comment on uenv pr">
 </div>
 
+<!--
+We create a CI/CD project that white lists CSCS staff responsible for uenv recipes
+- with access to push images for all target systems
+-->
+
 ---
 layout: two-cols-header
 ---
@@ -544,16 +517,17 @@ layout: two-cols-header
 
 ::left::
 
-The pipeline is maintained in a
-GitHub repository: [`eth-cscs/uenv-pipeline`](https://github.com/eth-cscs/uenv-pipeline)
+The pipeline logic is in a separate
+GitHub repository: [`eth-cscs/uenv-pipeline`](https://github.com/eth-cscs/uenv-pipeline):
 
-* generate pipeline from template
-* build and test phase implementation
-* image management
+* generate pipeline from template;
+* build and test phase implementation;
+* image management.
 
 ::right::
 
-Used by multiple services:
+**Used by multiple services:**
+
 * `uenv build` command
 * CI/CD external "uenv service"
 * community-maintained repositories (more later)
@@ -572,6 +546,9 @@ Triggered by comments on GitHub PRs.
     <img src="./images/pr-comment.png" class="h-30 shadow-xl" alt="comment on uenv pr">
 </div>
 
+<!--
+NOTES
+-->
 
 ---
 layout: two-cols-header
@@ -579,7 +556,7 @@ layout: two-cols-header
 
 # ReFrame Testing
 
-### **uenv need to be tested when they are built and daily to check for regressions.**
+### **uenv are tested after builing, and daily for regressions.**
 
 ::left::
 
@@ -594,7 +571,7 @@ ReFrame tests configured in the recipe:
 * `uenv pull --only-meta`: check meta data
 * run reframe tests
 
-**The reframe tests are described in a central repository**
+**The reframe tests are in a central repository**
 
 ::right::
 
@@ -745,3 +722,63 @@ Manual copy from build to deploy namespace
 <div class="flex justify-center">
     <img src="./images/harmen.png" class="h-20" alt="maybe the authors opinion">
 </div>
+
+---
+layout: two-cols-header
+---
+
+# Environment = Software + Runtime
+
+## We provide **pre-built software** and **the means to use it**
+
+::left::
+
+<div v-click>
+
+### **software** is built or downloaded.
+
+Scripts + Spack/Easybuild + **modules** on filesystem:
+- Pawsey on Setonix
+- CSCS on Daint-XC
+- E4S using Spack
+
+Download or build **containers**:
+- NVIDIA NGC
+- E4S containers
+- Podman
+
+</div>
+
+::right::
+
+<div v-click class="text-x1">
+
+### A **runtime** serves the software.
+
+Install a **modules** implementation:
+* TCL modules
+* Lmod
+
+<br>
+
+Provide a **container** runtime:
+* Podman/Apptainer/Sarus
+* pyxis+enroot
+
+</div>
+
+<!--
+We are in the business of providing software
+
+We have to decide how to build software and how users will load and use it.
+
+A very common approach: compile and install software on shared filesystem and provide modules.
+- the runtime is module command (pure modification of env variables)
+
+Other options exist: e.g. containers
+- you have to build the container and "install it somewhere"
+- and provide a container runtime
+- the question with containers is "how do we build the containers?"
+
+-->
+
