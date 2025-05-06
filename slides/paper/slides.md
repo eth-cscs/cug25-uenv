@@ -93,6 +93,7 @@ The Alps model sees support distributed across teams
 - The old model won't scale: teams need
     - e2e ability to install, upgrade, downgrade, deploy software stacks without root permission
 
+Remove system-wide requirements: Spack version and CPE
 "agile" and "independent" sw deployment: can we get user communities involved?
 -->
 
@@ -136,8 +137,8 @@ stackinator(recipe,cluster)➡️ Makefile➡️ Spack➡️ SquashFS
 * Minimal dependencies on the base OS (libfabric).
 
 Uses Spack and packages with SS11 optimizations:
-* The Spack version is set in the recipe;
-* Repackaged vendored software, e.g. `cray-mpich`.
+* **The Spack version is set in the recipe**;
+* We repackage vendored software, e.g. `cray-mpich`.
 
 The SquashFS images are **self-contained** and **independent**
 
